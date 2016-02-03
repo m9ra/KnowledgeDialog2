@@ -11,7 +11,13 @@ namespace KnowledgeDialog2.MindModel.Inference
     class OrRule : Rule
     {
         /// <inheritdoc/>
-        internal override IEnumerable<TripletTree> InferNewSupportingTriplets(WildcardTriplet wildcard, InferenceContext context)
+        internal override IEnumerable<TripletTree> FindSupportingTriplets(WildcardTriplet wildcard, InferenceContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        internal override IEnumerable<TripletTree> InferNewTriplets(IEnumerable<TripletTree> supportingTriplets, WildcardTriplet wildcard, InferenceContext context)
         {
             throw new NotImplementedException();
         }

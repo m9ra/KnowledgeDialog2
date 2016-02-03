@@ -16,21 +16,9 @@ namespace KnowledgeDialog2.MindModel.Inference
         public static Predicate ThenPredicate = Predicate.From("then");
 
         /// <inheritdoc/>
-        internal override IEnumerable<TripletTree> InferNewSupportingTriplets(WildcardTriplet wildcard, InferenceContext context)
+        internal override IEnumerable<TripletTree> FindSupportingTriplets(WildcardTriplet wildcard, InferenceContext context)
         {
-            var parents = context.FindSubstitutedSubtreeParents(wildcard);
-
-            //try to make inference step on triplets which possibly leads to answer for wildcard
-            var result = new List<TripletTree>();
-            foreach (var parent in parents.ToArray())
-            {
-                var supportingTriplet = makeInferenceStep(parent, context);
-                if (supportingTriplet == null)
-                    continue;
-                result.Add(supportingTriplet);
-            }
-
-            return result;
+            return context.FindSubstitutedSubtreeParents(wildcard);
         }
 
         /// <summary>
@@ -51,6 +39,17 @@ namespace KnowledgeDialog2.MindModel.Inference
 
             //condition doesn't hold -  we cannot infer
             return null;
+        }
+
+        /// <inheritdoc/>
+        internal override IEnumerable<TripletTree> InferNewTriplets(IEnumerable<TripletTree> supportingTriplets, WildcardTriplet wildcard, InferenceContext context)
+        {
+            foreach (var supportingTriplet in supportingTriplets)
+            {
+                var inferredTriplet = makeInferenceStep(supportingTriplet, context);
+                if (inferredTriplet != null)
+                    yield return inferredTriplet;
+            }
         }
     }
 }

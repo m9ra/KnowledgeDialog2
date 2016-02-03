@@ -49,19 +49,30 @@ namespace KnowledgeDialog2.MindModel
                 return new TripletTree[0];
             _requestedTripletsStack.Push(wildcard);
 
-            initializeWithRootSupportingFacts(wildcard);
+            initializeWithRootSupportingTriplets(wildcard);
 
+            var newSupportingTriplets = new List<TripletTree>(_supportingTriplets);
+            var currentSupportingTriplets = new List<TripletTree>();
             var hasInferenceChange = true;
             while (hasInferenceChange)
             {
+                //swapp triplet lists
+                var tmp = currentSupportingTriplets;
+                currentSupportingTriplets = newSupportingTriplets;
+                newSupportingTriplets = tmp;
+                newSupportingTriplets.Clear();
+
+                //infer new triplets from new supporting ones
                 hasInferenceChange = false;
                 foreach (var rule in _mind.InferenceRules)
                 {
-                    var supportingTriplets = rule.InferNewSupportingTriplets(wildcard, this);
-                    foreach (var supportingTriplet in supportingTriplets)
+                    foreach (var supportingTriplet in rule.InferNewTriplets(currentSupportingTriplets, wildcard, this))
                     {
                         if (addSupportingTriplet(supportingTriplet))
+                        {
+                            newSupportingTriplets.Add(supportingTriplet);
                             hasInferenceChange = true;
+                        }
                     }
                 }
             }
@@ -84,13 +95,14 @@ namespace KnowledgeDialog2.MindModel
         /// Finds existing root supporting facts for given wildcard.
         /// </summary>
         /// <param name="wildcard">The searched wildcard.</param>
-        private void initializeWithRootSupportingFacts(WildcardTriplet wildcard)
+        private void initializeWithRootSupportingTriplets(WildcardTriplet wildcard)
         {
-            foreach (var rootTriplet in _mind.RootTriplets)
+            foreach (var rule in _mind.InferenceRules)
             {
-                if (wildcard.IsSatisfiedBySubtreeSubstitution(rootTriplet))
-                    //triplet is not compatible or satisfiable
-                    addSupportingTriplet(rootTriplet);
+                foreach (var supportingTriplet in rule.FindSupportingTriplets(wildcard, this))
+                {
+                    addSupportingTriplet(supportingTriplet);
+                }
             }
         }
 
@@ -104,11 +116,26 @@ namespace KnowledgeDialog2.MindModel
             return _supportingTriplets.Add(triplet);
         }
 
+        /// <summary>
+        /// Finds parents of triplets which can satisfy wildcard after substitution.
+        /// </summary>
+        /// <param name="wildcard">The searching wildcard.</param>
+        /// <returns>The found result.</returns>
         internal IEnumerable<TripletTree> FindSubstitutedSubtreeParents(WildcardTriplet wildcard)
         {
-            return _supportingTriplets;
+            //TODO PERFORMANCE this should be done by using indexes
+            foreach (var rootTriplet in _mind.RootTriplets)
+            {
+                if (wildcard.IsSatisfiedBySubtreeSubstitution(rootTriplet))
+                    yield return rootTriplet;
+            }
         }
 
+        /// <summary>
+        /// Determine whether the triplet holds according to actual knowledge.
+        /// </summary>
+        /// <param name="triplet">The tested triplet.</param>
+        /// <returns><c>true</c> whether triplet can be inferred, <c>false</c> otherwise.</returns>
         internal bool Holds(TripletTree triplet)
         {
             return Find(WildcardTriplet.Exact(triplet)).Any();

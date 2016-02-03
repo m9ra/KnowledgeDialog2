@@ -101,6 +101,19 @@ namespace KnowledgeDialog2.Test
         }
 
         [TestMethod]
+        public void AndImplication_SupportingTriplet()
+        {
+            var mind = new MindModelTester();
+
+            mind.AddAxiom(Triplet.AB_and_CD_implies_EF);
+            mind.AddAxiom(Triplet.A_is_B);
+            mind.AddAxiom(Triplet.C_is_D);
+
+            //there is supporting fact
+            mind.AssertHolds(Triplet.E_is_F);
+        }
+
+        [TestMethod]
         public void ChainedImplication_SupportingTriplet()
         {
             var mind = new MindModelTester();
@@ -111,6 +124,21 @@ namespace KnowledgeDialog2.Test
 
             //there is supporting fact
             mind.AssertHolds(Triplet.C_is_D);
+            mind.AssertHolds(Triplet.X_is_Y);
+        }
+
+        [TestMethod]
+        public void ChainedAndImplication_SupportingTriplet()
+        {
+            var mind = new MindModelTester();
+
+            mind.AddAxiom(Triplet.AB_and_CD_implies_EF);
+            mind.AddAxiom(Triplet.EF_and_GH_implies_XY);
+            mind.AddAxiom(Triplet.A_is_B);
+            mind.AddAxiom(Triplet.C_is_D);
+            mind.AddAxiom(Triplet.G_is_H);
+
+            //there is supporting fact
             mind.AssertHolds(Triplet.X_is_Y);
         }
     }

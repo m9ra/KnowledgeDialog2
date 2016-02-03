@@ -34,6 +34,7 @@ namespace KnowledgeDialog2.MindModel
         public Mind()
         {
             _inferenceRules.Add(new Inference.ImplicationRule());
+            _inferenceRules.Add(new Inference.AndRule());
         }
 
         /// <summary>
