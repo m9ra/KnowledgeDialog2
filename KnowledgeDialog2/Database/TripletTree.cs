@@ -55,7 +55,7 @@ namespace KnowledgeDialog2.Database
         {
             return new TripletTree(subject, predicate, obj);
         }
-        
+
         /// <summary>
         /// Test whether any of triplets in subtree meets given condition.
         /// </summary>
@@ -68,7 +68,18 @@ namespace KnowledgeDialog2.Database
             tryRun(predicate, Object);
         }
 
-        #region Evaluation utilities
+        /// <summary>
+        /// Traverses all leaves of the tree with given action.
+        /// </summary>
+        /// <param name="action">Action to be runned on all leaves.</param>
+        public void Each(Action<TripletTree> action)
+        {
+            action(this);
+            tryRun(action, Subject);
+            tryRun(action, Object);
+        }
+
+        #region Tree traversing utilities
 
         private bool tryRun(Predicate<TripletTree> predicate, Entity entity)
         {
@@ -77,6 +88,15 @@ namespace KnowledgeDialog2.Database
                 return false;
 
             return tree.Any(predicate);
+        }
+
+        private void tryRun(Action<TripletTree> action, Entity entity)
+        {
+            var tree = entity as TripletTree;
+            if (tree == null)
+                return;
+
+            tree.Each(action);
         }
 
         #endregion

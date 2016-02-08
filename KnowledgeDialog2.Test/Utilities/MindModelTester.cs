@@ -52,7 +52,7 @@ namespace KnowledgeDialog2.Test.Utilities
         /// <param name="expectedResult">Expected result.</param>
         internal void AssertFind(WildcardTriplet wildcardTriplet, params TripletTree[] expectedResult)
         {
-            var actualResult = _mind.Find(wildcardTriplet).ToArray();
+            var actualResult = _mind.Find(wildcardTriplet).Take(10).ToArray();
             CollectionAssert.AreEquivalent(expectedResult, actualResult, "results of find");
         }
     }

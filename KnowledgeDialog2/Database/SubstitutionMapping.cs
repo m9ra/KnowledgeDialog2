@@ -47,6 +47,19 @@ namespace KnowledgeDialog2.Database
                 );
         }
 
+        internal WildcardTriplet Substitute(WildcardTriplet wildcard)
+        {
+            if (_mapping.Count == 0)
+                //there is nothing to substitute
+                return wildcard;
+
+            return WildcardTriplet.From(
+                substituted(wildcard.SearchedSubject),
+                substitutedPredicate(wildcard.SearchedPredicate),
+                substituted(wildcard.SearchedObject)
+                );
+        }
+
         /// <summary>
         /// Returns substituted entity.
         /// </summary>
@@ -54,6 +67,12 @@ namespace KnowledgeDialog2.Database
         /// <returns>The substitution.</returns>
         private Entity substituted(Entity entity)
         {
+            var subtree = entity as TripletTree;
+            if (subtree != null)
+                //substitute whole tree
+                return Substitute(subtree);
+
+            //try to substitute the entity
             Entity result;
             if (!_mapping.TryGetValue(entity, out result))
                 result = entity;
@@ -73,6 +92,29 @@ namespace KnowledgeDialog2.Database
                 predicate = (Predicate)result;
 
             return predicate;
+        }
+
+        /// <summary>
+        /// Get all possible substitutions induced by subtrees, such that satisfies the wildcard.
+        /// </summary>
+        /// <param name="triplet">Triplet to substitution.</param>
+        /// <param name="wildcard">Wildcard to satisfy.</param>
+        /// <returns>The substitutions.</returns>
+        internal static IEnumerable<TripletTree> GetSubtreeSubstitutions(TripletTree triplet, WildcardTriplet wildcard)
+        {
+            var substitutableSubtrees = new List<TripletTree>();
+            triplet.Each(t =>
+            {
+                if (wildcard.IsSatisfiedBySubstitution(t))
+                    substitutableSubtrees.Add(t);
+            });
+
+            foreach (var substitutableSubtree in substitutableSubtrees)
+            {
+                //TODO detection of infeasible mappings
+                var mapping = wildcard.GetSubstitutionMapping(substitutableSubtree);
+                yield return mapping.Substitute(triplet);
+            }
         }
     }
 }

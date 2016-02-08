@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
+using KnowledgeDialog2.MindModel.Rules;
 using KnowledgeDialog2.MindModel.Inference;
 
 namespace KnowledgeDialog2.MindModel
@@ -14,7 +15,7 @@ namespace KnowledgeDialog2.MindModel
         /// <summary>
         /// Available inference rules.
         /// </summary>
-        private readonly List<Rule> _inferenceRules = new List<Rule>();
+        private readonly List<InferenceStepProvider> _inferenceProviders = new List<InferenceStepProvider>();
 
         /// <summary>
         /// Facts that does not need inference.
@@ -29,12 +30,13 @@ namespace KnowledgeDialog2.MindModel
         /// <summary>
         /// Abilities available in current mind.
         /// </summary>
-        internal IEnumerable<Rule> InferenceRules { get { return _inferenceRules; } }
+        internal IEnumerable<InferenceStepProvider> InferenceStepProviders { get { return _inferenceProviders; } }
 
         public Mind()
         {
-            _inferenceRules.Add(new Inference.ImplicationRule());
-            _inferenceRules.Add(new Inference.AndRule());
+            _inferenceProviders.Add(LookupStep.Provider);
+            _inferenceProviders.Add(ImplicationStep.Provider);
+            _inferenceProviders.Add(AndStep.Provider);
         }
 
         /// <summary>
@@ -68,8 +70,8 @@ namespace KnowledgeDialog2.MindModel
         /// <returns>Found triplets.</returns>
         public IEnumerable<TripletTree> Find(WildcardTriplet wildcard)
         {
-            var inference = new InferenceContext(this);
-            return inference.Find(wildcard);
+            var inference = new Context(this, wildcard);
+            return inference.Find();
         }
 
         /// <summary>

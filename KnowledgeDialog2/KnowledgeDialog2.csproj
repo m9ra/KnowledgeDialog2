@@ -42,19 +42,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database\SubstitutionMapping.cs" />
-    <Compile Include="MindModel\Inference\Rule.cs" />
-    <Compile Include="MindModel\Inference\AndRule.cs" />
-    <Compile Include="MindModel\Inference\OrRule.cs" />
-    <Compile Include="MindModel\Inference\ImplicationRule.cs" />
+    <Compile Include="MindModel\Inference\Instructions\ExpandState.cs" />
+    <Compile Include="MindModel\Inference\InferenceLevel.cs" />
+    <Compile Include="MindModel\Inference\TripletTreeReader.cs" />
+    <Compile Include="MindModel\Rules\InferenceStep.cs" />
+    <Compile Include="MindModel\Rules\AndStep.cs" />
+    <Compile Include="MindModel\Rules\LookupStep.cs" />
+    <Compile Include="MindModel\Rules\OrStep.cs" />
+    <Compile Include="MindModel\Rules\ImplicationStep.cs" />
     <Compile Include="Database\Entity.cs" />
-    <Compile Include="MindModel\InferenceContext.cs" />
+    <Compile Include="MindModel\Inference\Context.cs" />
     <Compile Include="Database\NamedEntity.cs" />
     <Compile Include="Database\Predicate.cs" />
     <Compile Include="Database\TripletTree.cs" />
     <Compile Include="MindModel\Mind.cs" />
     <Compile Include="Database\WildcardTriplet.cs" />
+    <Compile Include="MindModel\Requirement.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\MultiDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

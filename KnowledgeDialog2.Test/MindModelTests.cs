@@ -141,5 +141,32 @@ namespace KnowledgeDialog2.Test
             //there is supporting fact
             mind.AssertHolds(Triplet.X_is_Y);
         }
+
+        [TestMethod]
+        public void ComplexAndImplication_SameAsDefinition()
+        {
+            var mind = new MindModelTester();
+
+            var same = "same";
+            var Var1sameVar2 = TripletTree.Flat("$Var1", same, "$Var2");
+            var Var1Var3Var4 = TripletTree.Flat("$Var1", "$Var3", "$Var4");
+            var Var2Var3Var4 = TripletTree.Flat("$Var2", "$Var3", "$Var4");
+            var isSameAndHasPropertyV4 = Triplet.And(Var1sameVar2, Var2Var3Var4);
+
+            var sameAsDefinition = Triplet.Implication(isSameAndHasPropertyV4, Var1Var3Var4);
+            var A_same_C = TripletTree.Flat("A", same, "C");
+            mind.AddAxiom(sameAsDefinition);
+            mind.AddAxiom(A_same_C);
+
+            mind.AddAxiom(Triplet.C_is_B); 
+            mind.AddAxiom(Triplet.C_is_D);
+
+            //A should have same properties as C
+            mind.AssertHolds(Triplet.A_is_B);
+            mind.AssertHolds(Triplet.A_is_D);
+
+            //there is no evidence for A nor C to has B
+            //mind.AssertNotHolds(TripletTree.Flat("A", "has", "B"));
+        }
     }
 }

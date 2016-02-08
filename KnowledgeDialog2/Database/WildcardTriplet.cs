@@ -63,9 +63,9 @@ namespace KnowledgeDialog2.Database
         {
             //test whether we have comaptible signature for substitution
             var hasCompatibleSignature = (
-                (SearchedSubject == null || triplet.Subject.IsVariable || SearchedSubject.Equals(triplet.Subject)) &&
-                (SearchedPredicate == null || triplet.Predicate.IsVariable || SearchedPredicate.Equals(triplet.Predicate)) &&
-                (SearchedObject == null || triplet.Object.IsVariable || SearchedObject.Equals(triplet.Object))
+                (SearchedSubject == null || SearchedSubject.IsVariable || triplet.Subject.IsVariable || SearchedSubject.Equals(triplet.Subject)) &&
+                (SearchedPredicate == null || SearchedPredicate.IsVariable || triplet.Predicate.IsVariable || SearchedPredicate.Equals(triplet.Predicate)) &&
+                (SearchedObject == null || SearchedObject.IsVariable|| triplet.Object.IsVariable || SearchedObject.Equals(triplet.Object))
                 );
 
             //test which variables are shared between triplet parts
@@ -110,6 +110,18 @@ namespace KnowledgeDialog2.Database
             if (!IsSatisfiedBySubstitution(triplet))
                 return null;
 
+            var substitution = GetSubstitutionMapping(triplet);
+
+            return substitution.Substitute(triplet);
+        }
+
+        /// <summary>
+        /// Gest substitution mapping for the triplet.
+        /// </summary>
+        /// <param name="triplet">The triplet to substitute.</param>
+        /// <returns>The mapping.</returns>
+        internal SubstitutionMapping GetSubstitutionMapping(TripletTree triplet)
+        {
             var substitution = new SubstitutionMapping();
             if (triplet.Subject.IsVariable && SearchedSubject != null)
                 substitution.Map(triplet.Subject, SearchedSubject);
@@ -120,7 +132,7 @@ namespace KnowledgeDialog2.Database
             if (triplet.Object.IsVariable && SearchedObject != null)
                 substitution.Map(triplet.Object, SearchedObject);
 
-            return substitution.Substitute(triplet);
+            return substitution;
         }
 
         ///<inheritdoc/>
