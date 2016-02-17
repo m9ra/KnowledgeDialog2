@@ -7,34 +7,23 @@ using System.Threading.Tasks;
 using KnowledgeDialog2.Database;
 using KnowledgeDialog2.MindModel;
 
+using KnowledgeDialog2.Parsing;
+using KnowledgeDialog2.Parsing.Lexical;
+using KnowledgeDialog2.Parsing.Lexical.Words;
+
+using KnowledgeDialog2.Parsing.Triplet;
+
 namespace KnowledgeDialog2
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var mind = new Mind();
+            var testExpression = new LexicalExpression("snow is white", new Word[] { new Unknown("snow"), new Verb("is"), new Unknown("white") });
+            var tripletParser = new Parsing.Triplet.TripletParser();
 
-            var tripletAB = TripletTree.Flat("A", "is", "B");
-            var tripletCD = TripletTree.Flat("C", "is", "D");
-            var tripletXY = TripletTree.Flat("X", "is", "Y");
-
-            mind.AddAxiom(TripletTree.From(tripletAB, "then", tripletCD));
-            mind.AddAxiom(TripletTree.From(tripletCD, "then", tripletXY));
-            var falseAssertCD = mind.Holds(tripletCD);
-            var falseAssertXY = mind.Holds(tripletXY);
-
-            mind.AddAxiom(tripletAB);
-            var trueAssertCD = mind.Holds(tripletCD);
-            var trueAssertXY = mind.Holds(tripletXY);
-
-            
-
-            if (falseAssertCD || !trueAssertCD)
-                throw new NotImplementedException("There is a BUG");
-
-            if (falseAssertXY || !trueAssertXY)
-                throw new NotImplementedException("There is a BUG");
+            var result = tripletParser.Parse(testExpression).ToArray();
+            Console.WriteLine(result[0]);
         }
     }
 }

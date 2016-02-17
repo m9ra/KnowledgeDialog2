@@ -58,12 +58,36 @@
     <Compile Include="MindModel\Mind.cs" />
     <Compile Include="Database\WildcardTriplet.cs" />
     <Compile Include="MindModel\Requirement.cs" />
+    <Compile Include="Parsing\Lexical\LexicalExpression.cs" />
+    <Compile Include="Parsing\Lexical\LexicalParser.cs" />
+    <Compile Include="Parsing\Lexical\Word.cs" />
+    <Compile Include="Parsing\Lexical\Words\Preposition.cs" />
+    <Compile Include="Parsing\Lexical\Words\Pronoun.cs" />
+    <Compile Include="Parsing\Lexical\Words\QuestionWord.cs" />
+    <Compile Include="Parsing\Lexical\Words\Unknown.cs" />
+    <Compile Include="Parsing\Lexical\Words\Verb.cs" />
+    <Compile Include="Parsing\Triplet\ParsingContext.cs" />
+    <Compile Include="Parsing\Triplet\PredicateRule.cs" />
+    <Compile Include="Parsing\Triplet\PredicateRuleConstraint.cs" />
+    <Compile Include="Parsing\Triplet\RuleConstraint.cs" />
+    <Compile Include="Parsing\Triplet\TripletParser.cs" />
+    <Compile Include="Parsing\Triplet\TripletRule.cs" />
+    <Compile Include="Parsing\Triplet\TripletRuleConstraint.cs" />
+    <Compile Include="Parsing\Triplet\WordGroupMatch.cs" />
+    <Compile Include="Parsing\Triplet\TripletWordGroup.cs" />
+    <Compile Include="Parsing\Triplet\WordGroupProcessor.cs" />
+    <Compile Include="Parsing\WordGroup.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\ArrayExtensions.cs" />
     <Compile Include="Utilities\MultiDictionary.cs" />
+    <Compile Include="Utilities\StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Dialog\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
