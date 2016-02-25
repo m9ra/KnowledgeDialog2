@@ -58,28 +58,33 @@ namespace KnowledgeDialog2.Parsing.Triplet
 
             //has to is same as must
             AddRule("#p1 #predicate #p2",
-                c => c.Inform("p1", "predicate", "p2")
+                c => c.Predicate("p1", "predicate", "p2")
                 );
 
             //snowball is made of snow
             AddRule("+subject #predicate +object",
-                c => c.Inform("subject", "predicate", "object")
+                c => c.Predicate("subject", "predicate", "object")
                 );
 
             //any snowball is made of snow
             AddRule("{variable_word} +subject #predicate +object",
-                c => c.Inform("subject", "predicate", "object")
+                c => c.Predicate("subject", "predicate", "object")
                 );
 
             //everyone needs air
             AddRule("{variable_word} #predicate +object",
-                c => c.Inform(c.Variable(1), "predicate", "object")
+                c => c.Predicate(c.Variable(1), "predicate", "object")
                 );
 
             //anything which is made of snow is white
             AddRule("{variable_word} [QuestionWord] #constraint_predicate +constraint_object #informed_predicate +informed_object",
-                c => { throw new NotImplementedException(); }
-                );
+                c =>
+                {
+                    var constraint = c.Predicate(c.Variable(1), "constraint_predicate", "constraint_object");
+                    var conclusion = c.Predicate(c.Variable(1), "informed_predicate", "informed_object");
+
+                    return c.Predicate(constraint, Predicate.From("then"), conclusion);
+                });
 
             //anything which is made of snow melts
             AddRule("{variable_word} [QuestionWord] #constraint_predicate +constraint_object #informed_predicate",
@@ -95,9 +100,11 @@ namespace KnowledgeDialog2.Parsing.Triplet
         public IEnumerable<TripletTree> Parse(LexicalExpression expression)
         {
             var lexicalGroups = createGroups(expression);
-            var lexicalGroupsWithPredicates = groupPredicates(lexicalGroups);
+            var lexicalGroupsWithPredicates = parseGroups(lexicalGroups, _orderedPredicateRules);
+            var groups = parseGroups(lexicalGroupsWithPredicates, _orderedTripletRules);
 
-            return getTriplets(lexicalGroupsWithPredicates);
+            var triplets = getTriplets(groups);
+            return triplets;
         }
 
         /// <summary>
@@ -121,7 +128,7 @@ namespace KnowledgeDialog2.Parsing.Triplet
         protected void AddRule(string pattern, TripletFactory factory)
         {
             var rule = new TripletRule(pattern, factory, this);
-            _orderedTripletRules.Add(rule);
+            _orderedTripletRules.Insert(0, rule);
         }
 
         protected void AddPredicatePattern(string pattern, PredicateFactory factory)
@@ -132,25 +139,42 @@ namespace KnowledgeDialog2.Parsing.Triplet
         }
         #endregion
 
-        #region Triplet parsing utilities
+        #region Parsing utilities
+
+        private IEnumerable<TripletWordGroup> parseGroups<Processor>(IEnumerable<TripletWordGroup> groups, List<Processor> rules)
+            where Processor : WordGroupProcessor
+        {
+            var currentGroups = groups.ToArray();
+            var ruleIndex = 0;
+            while (ruleIndex < rules.Count)
+            {
+                var tripletRule = rules[ruleIndex];
+                var processedGroups = processGroups(tripletRule, currentGroups);
+                if (processedGroups == null)
+                {
+                    //rule did not change anything
+                    ++ruleIndex;
+                }
+                else
+                {
+                    //rule changed the groups
+                    currentGroups = processedGroups;
+
+                    //we will restart iteration to keep rules priority
+                    ruleIndex = 0;
+                }
+            }
+
+            return currentGroups;
+        }
 
         private IEnumerable<TripletTree> getTriplets(IEnumerable<TripletWordGroup> groups)
         {
-            var currentGroups = groups.ToArray();
-            foreach (var tripletRule in _orderedTripletRules)
-            {
-                currentGroups = processGroups(tripletRule, currentGroups);
-            }
-
-            if (currentGroups.Length != 1)
+            if (groups.Count() != 1)
                 throw new NotImplementedException("Cannot parse into triplets");
 
-            return new[] { currentGroups[0].AsTriplet() };
+            return new[] { groups.First().AsTriplet() };
         }
-
-        #endregion
-
-        #region Predicate parsing utilities
 
         private IEnumerable<TripletWordGroup> createGroups(LexicalExpression expression)
         {
@@ -163,17 +187,6 @@ namespace KnowledgeDialog2.Parsing.Triplet
             return result;
         }
 
-        private IEnumerable<TripletWordGroup> groupPredicates(IEnumerable<TripletWordGroup> groups)
-        {
-            var currentGroups = groups.ToArray();
-            foreach (var predicateRule in _orderedPredicateRules)
-            {
-                currentGroups = processGroups(predicateRule, currentGroups);
-            }
-
-            return currentGroups;
-        }
-
         #endregion
 
         private TripletWordGroup[] processGroups(WordGroupProcessor rule, TripletWordGroup[] groups)
@@ -183,18 +196,26 @@ namespace KnowledgeDialog2.Parsing.Triplet
             {
                 var match = rule.Match(groups, groupIndex);
 
-                var group = groups[groupIndex];
                 if (match != null)
                 {
                     //matched groups will be replaced
-                    group = match.ResultGroup;
-                    groupIndex = groupIndex + match.Length - 1;
+                    result.Add(match.ResultGroup);
+                    for (groupIndex = groupIndex + match.Length; groupIndex < groups.Length; ++groupIndex)
+                    {
+                        //remaining groups won't be changed in this iteration.
+                        result.Add(groups[groupIndex]);
+                    }
+
+                    //stop the iteration to not break rule application priority
+                    return result.ToArray();
                 }
 
+                var group = groups[groupIndex];
                 result.Add(group);
             }
 
-            return result.ToArray();
+            //nothing has been matched
+            return null;
         }
     }
 }

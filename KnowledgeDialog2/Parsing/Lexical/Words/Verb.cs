@@ -8,6 +8,13 @@ namespace KnowledgeDialog2.Parsing.Lexical.Words
 {
     class Verb : Word
     {
-        public Verb(string originalForm) : base(originalForm) { }
+        /// <summary>
+        /// Basic form of verb.
+        /// </summary>
+        public readonly string BasicForm;
+
+        public Verb(string originalForm, string basicForm) : base(originalForm) {
+            BasicForm = basicForm;
+        }
     }
 }

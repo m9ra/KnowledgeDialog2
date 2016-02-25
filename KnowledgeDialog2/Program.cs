@@ -19,11 +19,14 @@ namespace KnowledgeDialog2
     {
         static void Main(string[] args)
         {
-            var testExpression = new LexicalExpression("snow is white", new Word[] { new Unknown("snow"), new Verb("is"), new Unknown("white") });
-            var tripletParser = new Parsing.Triplet.TripletParser();
+            var lexicalParser = new Parsing.Lexical.LexicalParser(args[0]);
+            var expression = lexicalParser.Parse("anything which is made of snow is white");
 
-            var result = tripletParser.Parse(testExpression).ToArray();
+            var tripletParser = new Parsing.Triplet.TripletParser();
+            var result = tripletParser.Parse(expression).ToArray();
+
             Console.WriteLine(result[0]);
+            Console.ReadKey();
         }
     }
 }

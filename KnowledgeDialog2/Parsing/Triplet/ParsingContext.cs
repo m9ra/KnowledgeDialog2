@@ -30,7 +30,7 @@ namespace KnowledgeDialog2.Parsing.Triplet
             _namedGroups = matchMapping;
         }
 
-        internal Database.TripletTree Inform(string subjectIdentifier, string predicateIdentifier, string objectIdentifier)
+        internal Database.TripletTree Predicate(object subjectIdentifier, object predicateIdentifier, object objectIdentifier)
         {
             var subject = getEntity(subjectIdentifier);
             var predicate = getPredicate(predicateIdentifier);
@@ -39,9 +39,9 @@ namespace KnowledgeDialog2.Parsing.Triplet
             return Database.TripletTree.From(subject, predicate, objectEntity);
         }
 
-        internal string Variable(int p)
+        internal Entity Variable(int index)
         {
-            throw new NotImplementedException();
+            return NamedEntity.From("$" + index);
         }
 
         internal Predicate Predicate(params int[] tokenIndexes)
@@ -50,19 +50,33 @@ namespace KnowledgeDialog2.Parsing.Triplet
             return Database.Predicate.From(predicateText);
         }
 
-        private Entity getEntity(string identifier)
+        private Entity getEntity(object identifier)
         {
-            var groups = _namedGroups[identifier].ToArray();
+            if (identifier is Entity)
+                return identifier as Entity;
 
-            var entityName = string.Join(" ",groups.Select(g => g.TextSpan));
+            var identifierStr = identifier as string;
+            if (identifierStr == null)
+                throw new NotImplementedException();
+
+            var groups = _namedGroups[identifierStr].ToArray();
+
+            var entityName = string.Join(" ", groups.Select(g => g.TextSpan));
             var entity = NamedEntity.From(entityName);
 
             return entity;
         }
 
-        private Predicate getPredicate(string identifier)
+        private Predicate getPredicate(object identifier)
         {
-            var groups = _namedGroups[identifier].ToArray();
+            if (identifier is Entity)
+                return identifier as Predicate;
+
+            var identifierStr = identifier as string;
+            if (identifierStr == null)
+                throw new NotImplementedException();
+
+            var groups = _namedGroups[identifierStr].ToArray();
             Predicate predicate = null;
 
             if (groups.Count() == 1)
