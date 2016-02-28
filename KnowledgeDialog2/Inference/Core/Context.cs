@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 using KnowledgeDialog2.Database;
 using KnowledgeDialog2.Utilities;
 
-using KnowledgeDialog2.MindModel.Rules;
+using KnowledgeDialog2.Inference.Rules;
 
-namespace KnowledgeDialog2.MindModel.Inference
+namespace KnowledgeDialog2.Inference.Core
 {
     class Context
     {
         /// <summary>
         /// Mind used for inference.
         /// </summary>
-        private readonly Mind _mind;
+        private readonly InferenceEngine _mind;
 
         /// <summary>
         /// Root state of the searched wildcard.
@@ -48,7 +48,7 @@ namespace KnowledgeDialog2.MindModel.Inference
         /// </summary>
         private readonly Queue<TripletTree> _tripletsToReport = new Queue<TripletTree>();
 
-        internal Context(Mind mind, WildcardTriplet rootWildcard)
+        internal Context(InferenceEngine mind, WildcardTriplet rootWildcard)
         {
             _mind = mind;
             _rootLevel = getState(rootWildcard);

@@ -6,17 +6,12 @@ using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
 
-using KnowledgeDialog2.MindModel.Inference;
+using KnowledgeDialog2.Inference.Core;
 
-namespace KnowledgeDialog2.MindModel.Rules
+namespace KnowledgeDialog2.Inference.Rules
 {
     public class AndStep : InferenceStep
     {
-        /// <summary>
-        /// Predicate for and inference
-        /// </summary>
-        public static Predicate AndPredicate = Predicate.From("and");
-
         private readonly TripletTreeReader _reader1;
 
         private readonly TripletTreeReader _reader2;
@@ -68,15 +63,15 @@ namespace KnowledgeDialog2.MindModel.Rules
                 var substitutedReceivedTriplet = mapping.Substitute(receivedTriplet);
 
                 if (generateReverseOrder)
-                    Produce(TripletTree.From(substitutedRequestedTriplet, AndPredicate, substitutedReceivedTriplet));
+                    Produce(TripletTree.From(substitutedRequestedTriplet, Predicate.And, substitutedReceivedTriplet));
                 else
-                    Produce(TripletTree.From(substitutedReceivedTriplet, AndPredicate, substitutedRequestedTriplet));
+                    Produce(TripletTree.From(substitutedReceivedTriplet, Predicate.And, substitutedRequestedTriplet));
             }
         }
 
         internal static IEnumerable<InferenceStep> Provider(WildcardTriplet target, Context context)
         {
-            if (!AndPredicate.Equals(target.SearchedPredicate))
+            if (!Predicate.And.Equals(target.SearchedPredicate))
                 yield break;
 
             var condition1Tree = target.SearchedSubject as TripletTree;

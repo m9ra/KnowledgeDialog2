@@ -15,7 +15,7 @@ namespace KnowledgeDialog2.Parsing.Triplet
     /// <summary>
     /// Parses <see cref="LexicalExpression"/> into <see cref="TripletTree"/> representation.
     /// </summary>
-    class TripletParser
+    public class TripletParser
     {
         /// <summary>
         /// Rules for predicate creation ordered in descendend order - to avoid long/short ambiguity.
@@ -32,7 +32,7 @@ namespace KnowledgeDialog2.Parsing.Triplet
         /// </summary>
         private readonly Dictionary<string, WordGroup> _wordGroups = new Dictionary<string, WordGroup>();
 
-        internal TripletParser()
+        public TripletParser()
         {
             RegisterWordGroup("variable_word")
                 .Add("any", "anything", "anyone")
@@ -58,32 +58,32 @@ namespace KnowledgeDialog2.Parsing.Triplet
 
             //has to is same as must
             AddRule("#p1 #predicate #p2",
-                c => c.Predicate("p1", "predicate", "p2")
+                c => c.Triplet("p1", "predicate", "p2")
                 );
 
             //snowball is made of snow
             AddRule("+subject #predicate +object",
-                c => c.Predicate("subject", "predicate", "object")
+                c => c.Triplet("subject", "predicate", "object")
                 );
 
             //any snowball is made of snow
             AddRule("{variable_word} +subject #predicate +object",
-                c => c.Predicate("subject", "predicate", "object")
+                c => c.Triplet("subject", "predicate", "object")
                 );
 
             //everyone needs air
             AddRule("{variable_word} #predicate +object",
-                c => c.Predicate(c.Variable(1), "predicate", "object")
+                c => c.Triplet(c.Variable(1), "predicate", "object")
                 );
 
             //anything which is made of snow is white
             AddRule("{variable_word} [QuestionWord] #constraint_predicate +constraint_object #informed_predicate +informed_object",
                 c =>
                 {
-                    var constraint = c.Predicate(c.Variable(1), "constraint_predicate", "constraint_object");
-                    var conclusion = c.Predicate(c.Variable(1), "informed_predicate", "informed_object");
+                    var constraint = c.Triplet(c.Variable(1), "constraint_predicate", "constraint_object");
+                    var conclusion = c.Triplet(c.Variable(1), "informed_predicate", "informed_object");
 
-                    return c.Predicate(constraint, Predicate.From("then"), conclusion);
+                    return c.Triplet(constraint, Predicate.From("then"), conclusion);
                 });
 
             //anything which is made of snow melts
@@ -118,20 +118,20 @@ namespace KnowledgeDialog2.Parsing.Triplet
         }
 
         #region Parsing rule creation
-        protected WordGroup RegisterWordGroup(string groupName)
+        private WordGroup RegisterWordGroup(string groupName)
         {
             var wordGroup = new WordGroup(groupName);
             _wordGroups.Add(groupName, wordGroup);
             return wordGroup;
         }
 
-        protected void AddRule(string pattern, TripletFactory factory)
+        private void AddRule(string pattern, TripletFactory factory)
         {
             var rule = new TripletRule(pattern, factory, this);
             _orderedTripletRules.Insert(0, rule);
         }
 
-        protected void AddPredicatePattern(string pattern, PredicateFactory factory)
+        private void AddPredicatePattern(string pattern, PredicateFactory factory)
         {
             var rule = new PredicateRule(pattern, factory, this);
             _orderedPredicateRules.Add(rule);

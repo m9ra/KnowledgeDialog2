@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeDialog2.Parsing.Lexical
 {
-    abstract class Word
+    public abstract class Word
     {
         /// <summary>
         /// Word as originaly appeared in the text.

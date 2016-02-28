@@ -107,7 +107,7 @@ namespace KnowledgeDialog2.Test.Utilities
         /// <returns>The implication.</returns>
         internal static TripletTree Implication(TripletTree triplet1, TripletTree triplet2)
         {
-            return TripletTree.From(triplet1, MindModel.Rules.ImplicationStep.ThenPredicate, triplet2);
+            return TripletTree.From(triplet1, Predicate.Then, triplet2);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace KnowledgeDialog2.Test.Utilities
         /// <returns>The conjunction.</returns>
         internal static TripletTree And(TripletTree triplet1, TripletTree triplet2)
         {
-            return TripletTree.From(triplet1, MindModel.Rules.AndStep.AndPredicate, triplet2);
+            return TripletTree.From(triplet1, Predicate.And, triplet2);
         }
     }
 }

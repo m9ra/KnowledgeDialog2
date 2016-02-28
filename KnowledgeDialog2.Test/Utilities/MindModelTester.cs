@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using KnowledgeDialog2.Database;
-using KnowledgeDialog2.MindModel;   
+using KnowledgeDialog2.Inference;   
 
 namespace KnowledgeDialog2.Test.Utilities
 {
@@ -16,7 +16,7 @@ namespace KnowledgeDialog2.Test.Utilities
         /// <summary>
         /// The tested mind model.
         /// </summary>
-        private readonly Mind _mind = new Mind();
+        private readonly InferenceEngine _mind = new InferenceEngine();
 
         /// <summary>
         /// Adds axiom into tested model.

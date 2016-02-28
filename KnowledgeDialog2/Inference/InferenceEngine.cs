@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
-using KnowledgeDialog2.MindModel.Rules;
-using KnowledgeDialog2.MindModel.Inference;
+using KnowledgeDialog2.Inference.Rules;
+using KnowledgeDialog2.Inference.Core;
 
-namespace KnowledgeDialog2.MindModel
+namespace KnowledgeDialog2.Inference
 {
-    public class Mind
+    public class InferenceEngine
     {
         /// <summary>
         /// Available inference rules.
@@ -32,7 +32,7 @@ namespace KnowledgeDialog2.MindModel
         /// </summary>
         internal IEnumerable<InferenceStepProvider> InferenceStepProviders { get { return _inferenceProviders; } }
 
-        public Mind()
+        public InferenceEngine()
         {
             _inferenceProviders.Add(LookupStep.Provider);
             _inferenceProviders.Add(ImplicationStep.Provider);

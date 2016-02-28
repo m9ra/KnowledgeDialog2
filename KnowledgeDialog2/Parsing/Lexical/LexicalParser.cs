@@ -16,14 +16,14 @@ namespace KnowledgeDialog2.Parsing.Lexical
     /// <summary>
     /// Parses strings to words with lexical information.
     /// </summary>
-    class LexicalParser
+    public class LexicalParser
     {
         /// <summary>
         /// Words that are stored statically (no word changes are allowed).
         /// </summary>
         private readonly MultiDictionary<string, Word> _staticWords = new MultiDictionary<string, Word>();
 
-        internal LexicalParser(string lexiconRoot)
+        public LexicalParser(string lexiconRoot)
         {
             var verbs = Path.Combine(lexiconRoot, "verbs.lex");
             var prepositions = Path.Combine(lexiconRoot, "prepositions.lex");
@@ -38,7 +38,7 @@ namespace KnowledgeDialog2.Parsing.Lexical
         /// </summary>
         /// <param name="expression">The lexical form of expression.</param>
         /// <returns>The parsed form.</returns>
-        internal LexicalExpression Parse(string expression)
+        public LexicalExpression Parse(string expression)
         {
             var words = expression.Split(' ');
             var lexicalWords = new List<Word>();

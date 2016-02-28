@@ -9,6 +9,11 @@ namespace KnowledgeDialog2.Database
     public abstract class Entity
     {
         /// <summary>
+        /// Entity for question representation.
+        /// </summary>
+        public static readonly Entity Question = NamedEntity.From("question");
+
+        /// <summary>
         /// Distinguishing name of the entity.
         /// </summary>
         internal readonly string Name;

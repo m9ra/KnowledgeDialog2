@@ -30,7 +30,7 @@ namespace KnowledgeDialog2.Parsing.Triplet
             _namedGroups = matchMapping;
         }
 
-        internal Database.TripletTree Predicate(object subjectIdentifier, object predicateIdentifier, object objectIdentifier)
+        internal Database.TripletTree Triplet(object subjectIdentifier, object predicateIdentifier, object objectIdentifier)
         {
             var subject = getEntity(subjectIdentifier);
             var predicate = getPredicate(predicateIdentifier);

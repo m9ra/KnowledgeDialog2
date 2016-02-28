@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeDialog2.Parsing.Lexical
 {
-    class LexicalExpression
+    public class LexicalExpression
     {
         /// <summary>
         /// Original expression from which words come from.
@@ -26,7 +26,7 @@ namespace KnowledgeDialog2.Parsing.Lexical
         internal LexicalExpression(string originalExpression, IEnumerable<Word> words)
         {
             _originalExpression = originalExpression;
-            _words= words.ToArray();
+            _words = words.ToArray();
         }
     }
 }

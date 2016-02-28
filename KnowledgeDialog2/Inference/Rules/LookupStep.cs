@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
-using KnowledgeDialog2.MindModel.Inference;
+using KnowledgeDialog2.Inference.Core;
 
-namespace KnowledgeDialog2.MindModel.Rules
+namespace KnowledgeDialog2.Inference.Rules
 {
     class LookupStep : InferenceStep
     {

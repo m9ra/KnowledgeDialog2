@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
-using KnowledgeDialog2.MindModel.Rules;
+using KnowledgeDialog2.Inference.Rules;
 
-namespace KnowledgeDialog2.MindModel
+namespace KnowledgeDialog2.Inference
 {
     class Requirement
     {

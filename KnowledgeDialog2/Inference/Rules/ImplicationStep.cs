@@ -6,16 +6,12 @@ using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
 
-using KnowledgeDialog2.MindModel.Inference;
+using KnowledgeDialog2.Inference.Core;
 
-namespace KnowledgeDialog2.MindModel.Rules
+namespace KnowledgeDialog2.Inference.Rules
 {
     public class ImplicationStep : InferenceStep
     {
-        /// <summary>
-        /// Predicate for implication inference
-        /// </summary>
-        public static Predicate ThenPredicate = Predicate.From("then");
 
         /// <summary>
         /// Reader for implication conditions.
@@ -51,7 +47,7 @@ namespace KnowledgeDialog2.MindModel.Rules
                 var thenTrees = new List<TripletTree>();
                 substitutedTree.Each(t =>
                 {
-                    if (ThenPredicate.Equals(t.Predicate))
+                    if (Predicate.Then.Equals(t.Predicate))
                         thenTrees.Add(t);
                 });
 

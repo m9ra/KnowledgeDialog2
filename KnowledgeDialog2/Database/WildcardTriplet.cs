@@ -23,6 +23,21 @@ namespace KnowledgeDialog2.Database
         /// </summary>
         public readonly Entity SearchedObject;
 
+        /// <summary>
+        /// Negation of current wildcard.
+        /// </summary>
+        public WildcardTriplet Negation
+        {
+            get
+            {
+                if (SearchedPredicate == null)
+                    //without specified predicate results of negation are the same
+                    return this;
+
+                return WildcardTriplet.From(SearchedObject, SearchedPredicate.Negation, SearchedObject);
+            }
+        }
+
         private WildcardTriplet(Entity searchedSubject, Predicate searchedPredicate, Entity searchedObject)
         {
             SearchedSubject = searchedSubject;
@@ -65,7 +80,7 @@ namespace KnowledgeDialog2.Database
             var hasCompatibleSignature = (
                 (SearchedSubject == null || SearchedSubject.IsVariable || triplet.Subject.IsVariable || SearchedSubject.Equals(triplet.Subject)) &&
                 (SearchedPredicate == null || SearchedPredicate.IsVariable || triplet.Predicate.IsVariable || SearchedPredicate.Equals(triplet.Predicate)) &&
-                (SearchedObject == null || SearchedObject.IsVariable|| triplet.Object.IsVariable || SearchedObject.Equals(triplet.Object))
+                (SearchedObject == null || SearchedObject.IsVariable || triplet.Object.IsVariable || SearchedObject.Equals(triplet.Object))
                 );
 
             //test which variables are shared between triplet parts

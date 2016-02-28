@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
 
-namespace KnowledgeDialog2.MindModel.Inference
+namespace KnowledgeDialog2.Inference.Core
 {
     /// <summary>
     /// Event used for reporting of triplet receiving.
