@@ -30,13 +30,25 @@ namespace KnowledgeDialog2.Parsing.Triplet
             _namedGroups = matchMapping;
         }
 
-        internal Database.TripletTree Triplet(object subjectIdentifier, object predicateIdentifier, object objectIdentifier)
+        internal TripletTree Triplet(object subjectIdentifier, object predicateIdentifier, object objectIdentifier)
         {
             var subject = getEntity(subjectIdentifier);
             var predicate = getPredicate(predicateIdentifier);
             var objectEntity = getEntity(objectIdentifier);
 
-            return Database.TripletTree.From(subject, predicate, objectEntity);
+            return TripletTree.From(subject, predicate, objectEntity);
+        }
+
+
+        internal TripletTree YesNoQuestion(object subjectIdentifier, object predicateIdentifier, object objectIdentifier)
+        {
+            var subject = getEntity(subjectIdentifier);
+            var predicate = getPredicate(predicateIdentifier);
+            var objectEntity = getEntity(objectIdentifier);
+
+            var questionObject = TripletTree.From(subject, predicate, objectEntity);
+
+            return TripletTree.From(Entity.Question, Database.Predicate.About, questionObject);
         }
 
         internal Entity Variable(int index)

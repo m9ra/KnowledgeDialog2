@@ -29,6 +29,11 @@ namespace KnowledgeDialog2.Database
         internal bool ContainsRootVariable { get { return Subject.IsVariable || Predicate.IsVariable || Object.IsVariable; } }
 
         /// <summary>
+        /// Negation of current triplet.
+        /// </summary>
+        public TripletTree Negation { get { return TripletTree.From(Object, Predicate.Negation, Object); } }
+
+        /// <summary>
         /// Determine whether any triplet of tree contains variable.
         /// </summary>
         internal bool ContainsVariable { get { return Any(t => t.ContainsRootVariable); } }

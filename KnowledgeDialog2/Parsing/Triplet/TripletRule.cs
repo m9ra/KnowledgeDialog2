@@ -37,47 +37,51 @@ namespace KnowledgeDialog2.Parsing.Triplet
         {
             //mapping of ids to matched groups
             var matchMapping = new Dictionary<string, IEnumerable<TripletWordGroup>>();
-            var currentGroup = groupIndex;
+            var currentGroupIndex = groupIndex;
 
             //process all constraints
             for (var i = 0; i < _constraints.Length; ++i)
             {
                 var constraint = _constraints[i];
-                var nextConstraint = i + 1 < _constraints.Length ? _constraints[i + 1] : null;
+                var nextConstraint = i + 1 >= _constraints.Length ? null : _constraints[i + 1];
 
                 var matchedGroups = new List<TripletWordGroup>();
                 matchMapping[constraint.Id] = matchedGroups;
 
-                if (currentGroup > groups.Length)
-                    //the constraint cannot be satisfied because there 
-                    //are no more groups to match
-                    return null;
-
-                while (currentGroup < groups.Length)
+                var isSatisfied = false;
+                while (currentGroupIndex < groups.Length)
                 {
-                    var group = groups[currentGroup];
-                    var isMatch = constraint.Match(group);
-                    var isNextConstraintMatch = nextConstraint != null && nextConstraint.Match(group);
+                    var currentGroup = groups[currentGroupIndex];
+                    var isMatch = constraint.Match(currentGroup);
+                    var isNextMatch = nextConstraint != null && nextConstraint.Match(currentGroup);
 
-                    if (isNextConstraintMatch)
-                        //the matching algorithm is greedy
-                        //we try to match as small groups as possible
+                    if (isSatisfied && isNextMatch)
+                        //we are greedy - matching as small groups as possible
+                        //leting next constraint to match
                         break;
 
-                    if (!isMatch)
-                        //constraint is not satisfied
-                        //and neither the NEXT CONSTRAINT 
-                        return null;
-
-                    ++currentGroup;
-                    matchedGroups.Add(group);
+                    if (isMatch)
+                    {
+                        isSatisfied = true;
+                        matchedGroups.Add(currentGroup);
+                        ++currentGroupIndex;
+                    }
+                    else
+                    {
+                        // current constraint cannot be further satisfied by current group
+                        break;
+                    }
                 }
+
+                if (!isSatisfied)
+                    //constraint was not satisfied.
+                    return null;
             }
 
             var context = new ParsingContext(matchMapping);
             var triplet = _factory(context);
             var tripletGroup = new TripletWordGroup(triplet);
-            var match = new WordGroupMatch(tripletGroup, currentGroup - groupIndex);
+            var match = new WordGroupMatch(tripletGroup, currentGroupIndex - groupIndex);
             return match;
         }
 

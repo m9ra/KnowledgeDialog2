@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using KnowledgeDialog2;
+using KnowledgeDialog2.Dialog;
+using KnowledgeDialog2.Utilities;
 
 using KnowledgeDialog2.Parsing.Lexical;
 using KnowledgeDialog2.Parsing.Triplet;
@@ -39,11 +40,20 @@ namespace CurioChatBot
         /// <inheritdoc/>
         protected override string input(string utterance)
         {
+            ConsoleServices.PrintLine("> " + utterance, ConsoleServices.ActiveColor);
+            ConsoleServices.Indent(1);
+
             var lexicalExpression = _lexicalParser.Parse(utterance);
             var triplets = _tripletParser.Parse(lexicalExpression);
             var response = _tripletManager.AcceptInput(triplets);
+            var responseStr = string.Join(", ", response);
 
-            return string.Join(", ", response);
+            ConsoleServices.PrintLine(string.Join(", ", triplets), ConsoleServices.InfoColor);
+            ConsoleServices.Indent(-1);
+            ConsoleServices.PrintLine("< " + responseStr, ConsoleServices.ActiveColor);
+            ConsoleServices.PrintEmptyLine();
+
+            return responseStr;
         }
     }
 }

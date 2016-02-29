@@ -22,9 +22,19 @@ namespace KnowledgeDialog2.Management.Triplet
         public static readonly Entity You = NamedEntity.From("you");
 
         /// <summary>
+        /// Representation of beeing sure.
+        /// </summary>
+        public static readonly Entity Sure = NamedEntity.From("sure");
+
+        /// <summary>
         /// Predicate describing that information is known already.
         /// </summary>
         public static readonly Predicate KnowAlready = Predicate.From("know already");
+
+        /// <summary>
+        /// Predicate describing knowing.
+        /// </summary>
+        public static readonly Predicate Know = Predicate.From("know");
 
         /// <summary>
         /// Predicate describing thank.
@@ -88,7 +98,58 @@ namespace KnowledgeDialog2.Management.Triplet
         private IEnumerable<TripletTree> answerQuestion(TripletTree question)
         {
             var reader = createWildcardReader(question);
-            throw new NotImplementedException();
+            var isYesNoQuestion = Predicate.About.Equals(question.Predicate); //TODO better yes no resolving
+
+            if (!isYesNoQuestion)
+                throw new NotImplementedException();
+
+            var questionObject = question.Object as TripletTree;
+            if (reader.HasEvidence)
+            {
+                //there is evidence for the positive answer
+                yield return questionObject;
+            }
+            else if (reader.HasNegativeEvidence)
+            {
+                yield return questionObject.Negation;
+            }
+            else
+            {
+                //try to request additional information for question answering.
+                var bestRequest = findBestPrecondition(reader);
+                if (bestRequest == null)
+                {
+                    yield return TripletTree.From(Me, Know.Negation, questionObject);
+                }
+                else
+                {
+                    yield return TripletTree.From(Me, Predicate.Is.Negation, Sure);
+                    yield return TripletTree.From(Entity.Question, Predicate.About, bestRequest);
+                }
+
+            }
+
+        }
+
+        /// <summary>
+        /// Finds best precondition which can be presented to the user according to question
+        /// in the reader.
+        /// </summary>
+        /// <param name="reader">Reader which request is searched.</param>
+        /// <returns>The request if any, <c>null</c> otherwise.</returns>
+        private TripletTree findBestPrecondition(WildcardReader reader)
+        {
+            var preconditions = reader.GetPreconditions().Take(100).ToList();
+
+            preconditions.Sort((a, b) => a.Score.CompareTo(b.Score));
+            var bestCondition=preconditions.LastOrDefault();
+
+            if (bestCondition == null)
+                return null;
+            
+            var conditionWildcard=bestCondition.Wildcard;
+            //TODO replace placeholders.
+            return TripletTree.From(conditionWildcard.SearchedSubject, conditionWildcard.SearchedPredicate, conditionWildcard.SearchedObject);
         }
 
         /// <summary>
@@ -131,10 +192,20 @@ namespace KnowledgeDialog2.Management.Triplet
         /// <returns>The created reader.</returns>
         private WildcardReader createWildcardReader(TripletTree triplet)
         {
+            WildcardTriplet wildcard;
             if (isQuestion(triplet))
-                throw new NotImplementedException();
+            {
+                var questionedFact = triplet.Object;
+                //TODO placeholder replacement
 
-            var wildcard = WildcardTriplet.Exact(triplet);
+                wildcard = WildcardTriplet.Exact(triplet.Object as TripletTree);
+            }
+            else
+            {
+                wildcard = WildcardTriplet.Exact(triplet);
+            }
+
+
             return createWildcardReader(wildcard);
         }
     }

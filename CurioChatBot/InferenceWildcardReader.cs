@@ -42,5 +42,12 @@ namespace CurioChatBot
             _engine = engine;
             _wildcard = wildcard;
         }
+
+        /// <inheritdoc/>
+        public override IEnumerable<Precondition> GetPreconditions()
+        {
+            //TODO possible reranking of preconditions
+            return _engine.Preconditions(_wildcard);
+        }
     }
 }

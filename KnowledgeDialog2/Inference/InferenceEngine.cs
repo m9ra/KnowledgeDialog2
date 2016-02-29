@@ -74,6 +74,18 @@ namespace KnowledgeDialog2.Inference
             return inference.Find();
         }
 
+
+        /// <summary>
+        /// Gets preconditions to given wildcard.
+        /// </summary>
+        /// <param name="wildcard">Wildcard which preconditions are requested.</param>
+        /// <returns></returns>
+        public IEnumerable<Precondition> Preconditions(WildcardTriplet wildcard)
+        {
+            var inference = new Context(this, wildcard);
+            return inference.Preconditions();
+        }
+
         /// <summary>
         /// Adds triplet as ground true (without any checks for absurdum)
         /// </summary>

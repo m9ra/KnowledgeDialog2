@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KnowledgeDialog2
+namespace KnowledgeDialog2.Dialog
 {
     /// <summary>
     /// Representation of a complete dialog system.

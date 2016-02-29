@@ -55,6 +55,10 @@ namespace KnowledgeDialog2.Parsing.Triplet
                 c => c.Predicate(0)
                 );
 
+            //is snowbal white
+            AddRule("#question_predicate +subject +object",
+                c => c.YesNoQuestion("subject", "question_predicate", "object")
+                );
 
             //has to is same as must
             AddRule("#p1 #predicate #p2",
@@ -75,6 +79,11 @@ namespace KnowledgeDialog2.Parsing.Triplet
             AddRule("{variable_word} #predicate +object",
                 c => c.Triplet(c.Variable(1), "predicate", "object")
                 );
+            
+            //anything which is made of snow melts
+            AddRule("{variable_word} [QuestionWord] #constraint_predicate +constraint_object #informed_predicate",
+                c => { throw new NotImplementedException(); }
+                );
 
             //anything which is made of snow is white
             AddRule("{variable_word} [QuestionWord] #constraint_predicate +constraint_object #informed_predicate +informed_object",
@@ -83,13 +92,8 @@ namespace KnowledgeDialog2.Parsing.Triplet
                     var constraint = c.Triplet(c.Variable(1), "constraint_predicate", "constraint_object");
                     var conclusion = c.Triplet(c.Variable(1), "informed_predicate", "informed_object");
 
-                    return c.Triplet(constraint, Predicate.From("then"), conclusion);
+                    return c.Triplet(constraint, Predicate.Then, conclusion);
                 });
-
-            //anything which is made of snow melts
-            AddRule("{variable_word} [QuestionWord] #constraint_predicate +constraint_object #informed_predicate",
-                c => { throw new NotImplementedException(); }
-                );
         }
 
         /// <summary>

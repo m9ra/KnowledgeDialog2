@@ -51,7 +51,7 @@ namespace KnowledgeDialog2.Inference.Core
         internal Context(InferenceEngine mind, WildcardTriplet rootWildcard)
         {
             _mind = mind;
-            _rootLevel = getState(rootWildcard);
+            _rootLevel = getState(null, rootWildcard);
             _levelsToExpand.Enqueue(_rootLevel);
             _levelsToGenerate.Enqueue(_rootLevel);
         }
@@ -87,6 +87,24 @@ namespace KnowledgeDialog2.Inference.Core
                 {
                     _levelsToExpand.Enqueue(expandedChild);
                     _levelsToGenerate.Enqueue(expandedChild);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Finds preconditions for the wildcard.
+        /// </summary>
+        /// <returns>The preconditions.</returns>
+        internal IEnumerable<Precondition> Preconditions()
+        {
+            while (_levelsToExpand.Count > 0)
+            {
+                var levelToExpand = _levelsToExpand.Dequeue();
+                foreach (var expandedChild in expand(levelToExpand))
+                {
+                    _levelsToExpand.Enqueue(expandedChild);
+
+                    yield return new Precondition(expandedChild.Condition, 1.0 / expandedChild.Depth);
                 }
             }
         }
@@ -159,7 +177,7 @@ namespace KnowledgeDialog2.Inference.Core
             foreach (var requirement in parent.GetRequirements())
             {
                 if (!_wildcardToLevel.ContainsKey(requirement))
-                    yield return getState(requirement);
+                    yield return getState(parent, requirement);
             }
         }
 
@@ -168,11 +186,11 @@ namespace KnowledgeDialog2.Inference.Core
         /// </summary>
         /// <param name="wildcard">The wildcard to infer.</param>
         /// <returns>The state.</returns>
-        private InferenceLevel getState(WildcardTriplet wildcard)
+        private InferenceLevel getState(InferenceLevel parent, WildcardTriplet wildcard)
         {
             InferenceLevel result;
             if (!_wildcardToLevel.TryGetValue(wildcard, out result))
-                _wildcardToLevel[wildcard] = result = new InferenceLevel(wildcard, createSteps(wildcard), this);
+                _wildcardToLevel[wildcard] = result = new InferenceLevel(parent, wildcard, createSteps(wildcard), this);
 
             return result;
         }

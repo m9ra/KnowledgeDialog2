@@ -45,7 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database\SubstitutionMapping.cs" />
-    <Compile Include="DialogSystem.cs" />
+    <Compile Include="Dialog\DialogSystem.cs" />
+    <Compile Include="Inference\Precondition.cs" />
     <Compile Include="Management\Triplet\TripletManager.cs" />
     <Compile Include="Inference\Core\InferenceLevel.cs" />
     <Compile Include="Inference\Core\TripletTreeReader.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="Parsing\WordGroup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\ArrayExtensions.cs" />
+    <Compile Include="Utilities\ConsoleServices.cs" />
     <Compile Include="Utilities\MultiDictionary.cs" />
     <Compile Include="Utilities\StringExtensions.cs" />
   </ItemGroup>

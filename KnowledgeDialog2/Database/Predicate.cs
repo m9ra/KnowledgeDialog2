@@ -14,6 +14,16 @@ namespace KnowledgeDialog2.Database
         public static readonly Predicate And = Predicate.From("and");
 
         /// <summary>
+        /// Predicate for topic specification.
+        /// </summary>
+        public static readonly Predicate About = Predicate.From("about");
+
+        /// <summary>
+        /// Is predicate.
+        /// </summary>
+        public static readonly Predicate Is = Predicate.From("is");
+
+        /// <summary>
         /// Predicate for implication inference.
         /// </summary>
         public static Predicate Then = Predicate.From("then");

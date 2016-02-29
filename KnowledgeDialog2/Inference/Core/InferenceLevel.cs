@@ -21,6 +21,11 @@ namespace KnowledgeDialog2.Inference.Core
         internal WildcardTriplet Condition;
 
         /// <summary>
+        /// Depth of the level.
+        /// </summary>
+        internal int Depth;
+
+        /// <summary>
         /// Context of the inference step.
         /// </summary>
         private readonly Context _context;
@@ -35,9 +40,10 @@ namespace KnowledgeDialog2.Inference.Core
         /// </summary>
         private readonly InferenceStep[] _steps;
 
-        internal InferenceLevel(WildcardTriplet condition, IEnumerable<InferenceStep> steps, Context context)
+        internal InferenceLevel(InferenceLevel parent, WildcardTriplet condition, IEnumerable<InferenceStep> steps, Context context)
         {
             Condition = condition;
+            Depth = parent == null ? 0 : parent.Depth + 1;
             _context = context;
             _steps = steps.ToArray();
         }
