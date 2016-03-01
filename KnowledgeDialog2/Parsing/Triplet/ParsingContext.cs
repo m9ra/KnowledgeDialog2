@@ -56,9 +56,14 @@ namespace KnowledgeDialog2.Parsing.Triplet
             return NamedEntity.From("$" + index);
         }
 
-        internal Predicate Predicate(params int[] tokenIndexes)
+        internal Predicate Predicate(params object[] tokenIndexes)
         {
-            var predicateText = string.Join(" ", tokenIndexes.Select(i => _positionalGroups[i].TextSpan));
+            var predicateText = string.Join(" ", tokenIndexes.Select(i => {
+                if (i is int)
+                    return _positionalGroups[(int)i].TextSpan;
+                else
+                    return i.ToString();
+            }));
             return Database.Predicate.From(predicateText);
         }
 

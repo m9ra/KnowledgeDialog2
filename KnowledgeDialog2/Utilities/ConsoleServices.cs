@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using KnowledgeDialog2.Database;
+
 namespace KnowledgeDialog2.Utilities
 {
     public static class ConsoleServices
@@ -92,6 +94,17 @@ namespace KnowledgeDialog2.Utilities
         {
             Print(data + Environment.NewLine, color);
             _needIndent = true;
+        }
+
+        /// <summary>
+        /// Prints line with stringified triplets and given color.
+        /// </summary>
+        /// <param name="triplets">The triplets to be printed.</param>
+        /// <param name="color">The color.</param>
+        public static void PrintLine(IEnumerable<TripletTree> triplets, ConsoleColor color)
+        {
+            var data = string.Join(", ", triplets);
+            PrintLine(data, color);
         }
 
         /// <summary>

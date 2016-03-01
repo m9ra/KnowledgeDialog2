@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Database\SubstitutionMapping.cs" />
     <Compile Include="Dialog\DialogSystem.cs" />
+    <Compile Include="Generation\Triplet\TripletNLG.cs" />
     <Compile Include="Inference\Precondition.cs" />
     <Compile Include="Management\Triplet\TripletManager.cs" />
     <Compile Include="Inference\Core\InferenceLevel.cs" />

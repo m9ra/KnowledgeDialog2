@@ -16,6 +16,9 @@ namespace CurioChatBot
         {
             var dialogSystem = new CurioDialogSystem(args[0]);
             dialogSystem.Input("anything which is made of snow is white");
+            dialogSystem.Input("anything which is made of frozen water is made of snow");
+            dialogSystem.Input("is snowball white");
+            dialogSystem.Input("snowball is made of frozen water");
             dialogSystem.Input("is snowball white");
 
             Console.ReadKey();

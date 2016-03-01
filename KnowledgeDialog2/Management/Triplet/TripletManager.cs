@@ -32,6 +32,16 @@ namespace KnowledgeDialog2.Management.Triplet
         public static readonly Predicate KnowAlready = Predicate.From("know already");
 
         /// <summary>
+        /// Prediate describing that the information is still known.
+        /// </summary>
+        public static readonly Predicate StillKnow = Predicate.From("still know");
+
+        /// <summary>
+        /// Predicate describing that the information is still not known.
+        /// </summary>
+        public static readonly Predicate StillDontKnow = StillKnow.Negation;
+
+        /// <summary>
         /// Predicate describing knowing.
         /// </summary>
         public static readonly Predicate Know = Predicate.From("know");
@@ -54,6 +64,11 @@ namespace KnowledgeDialog2.Management.Triplet
         /// <param name="fact">The accepted fact.</param>
         /// <returns><c>True</c> whether the fact has been accepted, <c>false</c> otherwise.</returns>
         protected abstract bool acceptFact(TripletTree fact);
+
+        /// <summary>
+        /// Unanswered questions that the user had.
+        /// </summary>
+        private readonly List<TripletTree> _pendingQuestions = new List<TripletTree>();
 
         /// <summary>
         /// Process triplets and provides according response.
@@ -98,37 +113,34 @@ namespace KnowledgeDialog2.Management.Triplet
         private IEnumerable<TripletTree> answerQuestion(TripletTree question)
         {
             var reader = createWildcardReader(question);
-            var isYesNoQuestion = Predicate.About.Equals(question.Predicate); //TODO better yes no resolving
+            var explicitAnswer = getAnswerWithQuestionConfirmation(reader, question);
+            if (explicitAnswer != null)
+                //we have answer
+                return new[] { explicitAnswer };
 
-            if (!isYesNoQuestion)
-                throw new NotImplementedException();
+            //otherwise we don't know
+            var isKnownQuestion = _pendingQuestions.Contains(question);
+            if (!isKnownQuestion)
+                //the question has not been asked during this conversation
+                _pendingQuestions.Add(question);
 
-            var questionObject = question.Object as TripletTree;
-            if (reader.HasEvidence)
+            //try to request additional information for question answering.
+            var bestPrecondition = findBestPrecondition(reader);
+            if (bestPrecondition == null)
             {
-                //there is evidence for the positive answer
-                yield return questionObject;
-            }
-            else if (reader.HasNegativeEvidence)
-            {
-                yield return questionObject.Negation;
+                //we don't have precondition to ask
+                if (isKnownQuestion)
+                    return triplet(Me, StillDontKnow, question.Object);
+                else
+                    return triplet(Me, Know.Negation, question.Object);
             }
             else
             {
-                //try to request additional information for question answering.
-                var bestRequest = findBestPrecondition(reader);
-                if (bestRequest == null)
-                {
-                    yield return TripletTree.From(Me, Know.Negation, questionObject);
-                }
-                else
-                {
-                    yield return TripletTree.From(Me, Predicate.Is.Negation, Sure);
-                    yield return TripletTree.From(Entity.Question, Predicate.About, bestRequest);
-                }
-
+                return
+                    triplet(Me, Predicate.Is.Negation, Sure).Concat(
+                    triplet(Entity.Question, Predicate.About, bestPrecondition)
+                    );
             }
-
         }
 
         /// <summary>
@@ -142,12 +154,12 @@ namespace KnowledgeDialog2.Management.Triplet
             var preconditions = reader.GetPreconditions().Take(100).ToList();
 
             preconditions.Sort((a, b) => a.Score.CompareTo(b.Score));
-            var bestCondition=preconditions.LastOrDefault();
+            var bestCondition = preconditions.LastOrDefault();
 
             if (bestCondition == null)
                 return null;
-            
-            var conditionWildcard=bestCondition.Wildcard;
+
+            var conditionWildcard = bestCondition.Wildcard;
             //TODO replace placeholders.
             return TripletTree.From(conditionWildcard.SearchedSubject, conditionWildcard.SearchedPredicate, conditionWildcard.SearchedObject);
         }
@@ -163,7 +175,7 @@ namespace KnowledgeDialog2.Management.Triplet
             if (reader.HasEvidence)
             {
                 //TODO try to infer new fact to implicit confirmation
-                yield return TripletTree.From(Me, KnowAlready, fact);
+                return triplet(Me, KnowAlready, fact);
             }
             else
             {
@@ -171,9 +183,78 @@ namespace KnowledgeDialog2.Management.Triplet
                     throw new NotImplementedException("inconsistency");
 
                 acceptFact(fact);
-                yield return TripletTree.From(Me, Thank, You);
+
+                var clarifiedAnswer = getClarifiedAnswers().FirstOrDefault();
+                if (clarifiedAnswer == null)
+                {
+                    return triplet(Me, Thank, You);
+                }
+                else
+                {
+                    return triplet(fact, Predicate.Then, clarifiedAnswer);
+
+                }
             }
         }
+            
+        /// <summary>
+        /// Gets answers for questions that has been clarified during time.
+        /// Those questions are also removed from pending ones.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<TripletTree> getClarifiedAnswers()
+        {
+            var result = new List<TripletTree>();
+            foreach (var pendingQuestion in _pendingQuestions.ToArray())
+            {
+                var answer = getAnswerWithQuestionConfirmation(pendingQuestion);
+                if (answer != null)
+                {
+                    result.Add(answer);
+                    _pendingQuestions.Remove(pendingQuestion);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets answer containing the question confirmation.
+        /// </summary>
+        /// <param name="question">The question.</param>
+        /// <returns>The answer if available, <c>null</c> otherwise.</returns>
+        private TripletTree getAnswerWithQuestionConfirmation(TripletTree question)
+        {
+            var reader = createWildcardReader(question);
+            return getAnswerWithQuestionConfirmation(reader, question);
+        }
+
+        /// <summary>
+        /// Gets answer containing the question confirmation.
+        /// </summary>
+        /// <param name="reader">The reader containing question wildcard.</param>
+        /// <param name="question">The question.</param>
+        /// <returns>The answer if available, <c>null</c> otherwise.</returns>
+        private TripletTree getAnswerWithQuestionConfirmation(WildcardReader reader, TripletTree question)
+        {
+            var isYesNoQuestion = Predicate.About.Equals(question.Predicate); //TODO better yes no resolving
+
+            if (!isYesNoQuestion)
+                throw new NotImplementedException();
+
+            var questionObject = question.Object as TripletTree;
+            if (reader.HasEvidence)
+            {
+                //there is evidence for the positive answer
+                return questionObject;
+            }
+            else if (reader.HasNegativeEvidence)
+            {
+                return questionObject.Negation;
+            }
+            return null;
+        }
+
 
         /// <summary>
         /// Determine whether triplet represents a question.
@@ -207,6 +288,18 @@ namespace KnowledgeDialog2.Management.Triplet
 
 
             return createWildcardReader(wildcard);
+        }
+
+        /// <summary>
+        /// Creates triplet with given subject, predicate and object.
+        /// </summary>
+        /// <param name="subject">The subject of triplet.</param>
+        /// <param name="predicate">The predicate of triplet.</param>
+        /// <param name="obj">The object of triplet.</param>
+        /// <returns>The created triplet wrapped into an array.</returns>
+        private IEnumerable<TripletTree> triplet(Entity subject, Predicate predicate, Entity obj)
+        {
+            return new[] { TripletTree.From(subject, predicate, obj) };
         }
     }
 }

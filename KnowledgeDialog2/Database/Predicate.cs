@@ -29,6 +29,11 @@ namespace KnowledgeDialog2.Database
         public static Predicate Then = Predicate.From("then");
 
         /// <summary>
+        /// Determine whether predicate is in negated form.
+        /// </summary>
+        public bool IsNegated { get { return Name.StartsWith("!"); } }
+
+        /// <summary>
         /// Negation of the predicate.
         /// </summary>
         public Predicate Negation

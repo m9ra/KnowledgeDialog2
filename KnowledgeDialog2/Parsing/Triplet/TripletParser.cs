@@ -42,7 +42,7 @@ namespace KnowledgeDialog2.Parsing.Triplet
 
             //snowball is made of snow
             AddPredicatePattern("is [Verb] [Preposition]",
-                c => c.Predicate(0, 1)
+                c => c.Predicate("is", 0, 1)
                 );
 
             //has to 
@@ -79,7 +79,7 @@ namespace KnowledgeDialog2.Parsing.Triplet
             AddRule("{variable_word} #predicate +object",
                 c => c.Triplet(c.Variable(1), "predicate", "object")
                 );
-            
+
             //anything which is made of snow melts
             AddRule("{variable_word} [QuestionWord] #constraint_predicate +constraint_object #informed_predicate",
                 c => { throw new NotImplementedException(); }
