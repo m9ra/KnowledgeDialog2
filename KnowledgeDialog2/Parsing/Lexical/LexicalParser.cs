@@ -27,9 +27,11 @@ namespace KnowledgeDialog2.Parsing.Lexical
         {
             var verbs = Path.Combine(lexiconRoot, "verbs.lex");
             var prepositions = Path.Combine(lexiconRoot, "prepositions.lex");
+            var conjunctions = Path.Combine(lexiconRoot, "conjunctions.lex");
 
             loadVerbs(verbs);
             loadPrepositions(prepositions);
+            loadConjunctions(conjunctions);
             loadQuestionWords();
         }
 
@@ -40,7 +42,8 @@ namespace KnowledgeDialog2.Parsing.Lexical
         /// <returns>The parsed form.</returns>
         public LexicalExpression Parse(string expression)
         {
-            var words = expression.Split(' ');
+            var cleanExpression = expression.Replace(",", "").Replace(".", "").Replace("!", "").Replace("?", "");
+            var words = cleanExpression.Split(' ');
             var lexicalWords = new List<Word>();
             foreach (var word in words)
             {
@@ -79,6 +82,21 @@ namespace KnowledgeDialog2.Parsing.Lexical
         }
 
         /// <summary>
+        /// Loads conjunctions from given lexicon file.
+        /// </summary>
+        /// <param name="path">The path to lexicon file.</param>
+        private void loadConjunctions(string path)
+        {
+            requireFile(path);
+
+            var conjunctions = File.ReadLines(path);
+            foreach (var conjunction in conjunctions)
+            {
+                _staticWords.Add(conjunction, new Conjunction(conjunction));
+            }
+        }
+
+        /// <summary>
         /// Load verbs from given lexicon file.
         /// </summary>
         /// <param name="path">The path to lexicon file.</param>
@@ -99,12 +117,22 @@ namespace KnowledgeDialog2.Parsing.Lexical
             {
                 var verbForms = line.Split(' ');
                 var basicForm = verbForms[0];
-                var pastForm = verbForms[1];
-                var pastParticipleForm = verbForms[1];
 
                 registerVerb(basicForm, basicForm);
-                registerVerb(pastForm, basicForm);
-                registerVerb(pastParticipleForm, basicForm);
+                if (verbForms.Length == 1)
+                {
+                    //regular verb
+                    registerRegularPastVerbForm(basicForm);
+                }
+                else
+                {
+                    //irregular verb
+                    var pastForm = verbForms[1];
+                    var pastParticipleForm = verbForms[1];
+
+                    registerVerb(pastForm, basicForm);
+                    registerVerb(pastParticipleForm, basicForm);
+                }
             }
         }
 
@@ -116,6 +144,22 @@ namespace KnowledgeDialog2.Parsing.Lexical
         private void registerVerb(string form, string basicForm)
         {
             var verb = new Verb(form, basicForm);
+            _staticWords.Add(verb.OriginalForm, verb);
+        }
+
+        /// <summary>
+        /// Registers past form of regular verb.
+        /// </summary>
+        /// <param name="basicForm">The basic form of verb.</param>
+        private void registerRegularPastVerbForm(string basicForm)
+        {
+            var pastForm = basicForm;
+            if (basicForm.EndsWith("e"))
+                pastForm += "d";
+            else
+                pastForm += "ed";
+
+            var verb = new Verb(pastForm, basicForm);
             _staticWords.Add(verb.OriginalForm, verb);
         }
 

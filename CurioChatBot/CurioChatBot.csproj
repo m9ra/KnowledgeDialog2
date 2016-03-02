@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="CurioDialogSystem.cs" />
     <Compile Include="CurioManager.cs" />
+    <Compile Include="DataProcessing\TextToSentenceParser.cs" />
     <Compile Include="InferenceWildcardReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

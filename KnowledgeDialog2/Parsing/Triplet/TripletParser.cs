@@ -45,15 +45,45 @@ namespace KnowledgeDialog2.Parsing.Triplet
                 c => c.Predicate("is", 0, 1)
                 );
 
+            //snowball is not made of snow
+            AddPredicatePattern("is not [Verb] [Preposition]",
+                c => c.Predicate("is", 0, 1).Negation
+                );
+
             //has to 
             AddPredicatePattern("[Verb] [Preposition]",
                 c => c.Predicate(0, 1)
+                );
+
+            //has not to 
+            AddPredicatePattern("not [Verb] [Preposition]",
+                c => c.Predicate(0, 1).Negation
+                );
+
+            //must not
+            AddPredicatePattern("[Verb] not",
+                c => c.Predicate(0).Negation
                 );
 
             //must
             AddPredicatePattern("[Verb]",
                 c => c.Predicate(0)
                 );
+
+            //and so on 
+            AddPredicatePattern("[Conjunction] [Conjunction] [Preposition]",
+              c => c.Predicate(0, 1, 2)
+              );
+
+            //and so
+            AddPredicatePattern("[Conjunction] [Conjunction]",
+              c => c.Predicate(0, 1)
+              );
+
+            //and
+            AddPredicatePattern("[Conjunction]",
+              c => c.Predicate(0)
+              );
 
             //is snowbal white
             AddRule("#question_predicate +subject +object",
@@ -93,6 +123,12 @@ namespace KnowledgeDialog2.Parsing.Triplet
                     var conclusion = c.Triplet(c.Variable(1), "informed_predicate", "informed_object");
 
                     return c.Triplet(constraint, Predicate.Then, conclusion);
+                });
+
+            AddRule("@triplet1 #predicate @triplet2",
+                c =>
+                {
+                    return c.Triplet("triplet1", "predicate", "triplet2");
                 });
         }
 
@@ -139,7 +175,7 @@ namespace KnowledgeDialog2.Parsing.Triplet
         {
             var rule = new PredicateRule(pattern, factory, this);
             _orderedPredicateRules.Add(rule);
-            _orderedPredicateRules.Sort((r1, r2) => r2.Length - r1.Length);
+            //_orderedPredicateRules.Sort((r1, r2) => r2.Length - r1.Length);
         }
         #endregion
 
@@ -174,10 +210,17 @@ namespace KnowledgeDialog2.Parsing.Triplet
 
         private IEnumerable<TripletTree> getTriplets(IEnumerable<TripletWordGroup> groups)
         {
-            if (groups.Count() != 1)
-                throw new NotImplementedException("Cannot parse into triplets");
+            var result = new List<TripletTree>();
+            foreach (var group in groups)
+            {
+                if (!(group.RawGroup is TripletTree))
+                    //parsing was not finished.
+                    return null;
 
-            return new[] { groups.First().AsTriplet() };
+                result.Add(group.AsTriplet());
+            }
+
+            return result;
         }
 
         private IEnumerable<TripletWordGroup> createGroups(LexicalExpression expression)

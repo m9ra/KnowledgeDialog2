@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using KnowledgeDialog2.Dialog;
+using KnowledgeDialog2.Database;
 using KnowledgeDialog2.Utilities;
 
 using KnowledgeDialog2.Parsing.Lexical;
@@ -50,8 +51,7 @@ namespace CurioChatBot
             ConsoleServices.PrintLine("< " + utterance, ConsoleServices.ActiveColor);
             ConsoleServices.Indent(2);
 
-            var lexicalInput = _lexicalParser.Parse(utterance);
-            var inputTriplets = _tripletParser.Parse(lexicalInput);
+            var inputTriplets = ParseToTriplets(utterance);
             ConsoleServices.PrintLine(inputTriplets, ConsoleServices.InfoColor);
 
             var responseTriplets = _tripletManager.AcceptInput(inputTriplets);
@@ -65,6 +65,18 @@ namespace CurioChatBot
             ConsoleServices.PrintEmptyLine();
 
             return response;
+        }
+
+        /// <summary>
+        /// Parses given input to triplet representation.
+        /// </summary>
+        /// <param name="input">Input to be parsed.</param>
+        /// <returns>The parse.</returns>
+        internal IEnumerable<TripletTree> ParseToTriplets(string input)
+        {
+            var lexicalInput = _lexicalParser.Parse(input);
+            var inputTriplets = _tripletParser.Parse(lexicalInput);
+            return inputTriplets;
         }
     }
 }

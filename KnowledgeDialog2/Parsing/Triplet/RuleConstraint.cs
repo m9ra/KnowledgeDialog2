@@ -53,6 +53,16 @@ namespace KnowledgeDialog2.Parsing.Triplet
             return g => g.RawGroup is Database.Predicate;
         }
 
+
+        /// <summary>
+        /// Creates matcher for triplets.
+        /// </summary>
+        /// <returns>The created matcher.</returns>
+        protected Predicate<TripletWordGroup> createTripletMatcher()
+        {
+            return g => g.RawGroup is Database.TripletTree;
+        }
+
         /// <summary>
         /// Creates matcher for subjects.
         /// </summary>

@@ -23,7 +23,7 @@ namespace KnowledgeDialog2.Utilities
         /// <summary>
         /// Color for important text.
         /// </summary>
-        public static readonly ConsoleColor ActiveColor = ConsoleColor.White;
+        public static readonly ConsoleColor ActiveColor = ConsoleColor.Yellow;
 
         /// <summary>
         /// Color for operators.

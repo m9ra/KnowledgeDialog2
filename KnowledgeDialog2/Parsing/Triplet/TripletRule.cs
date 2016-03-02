@@ -65,6 +65,10 @@ namespace KnowledgeDialog2.Parsing.Triplet
                         isSatisfied = true;
                         matchedGroups.Add(currentGroup);
                         ++currentGroupIndex;
+
+                        if (!constraint.IsMultiMatch)
+                            //we can match only one word to this constraint
+                            break;
                     }
                     else
                     {

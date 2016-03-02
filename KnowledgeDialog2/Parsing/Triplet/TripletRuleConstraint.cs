@@ -28,7 +28,12 @@ namespace KnowledgeDialog2.Parsing.Triplet
         /// <summary>
         /// Id of the constraint inferred from the pattern.
         /// </summary>
-        internal string Id;
+        internal readonly string Id;
+
+        /// <summary>
+        /// Determine whether multiple words can be matched to the group.
+        /// </summary>
+        internal readonly bool IsMultiMatch;
 
         internal TripletRuleConstraint(string pattern, TripletParser owner)
         {
@@ -39,6 +44,7 @@ namespace KnowledgeDialog2.Parsing.Triplet
             var isLexicalType = pattern.StartsWith("[") && pattern.EndsWith("]");
             var isPredicate = pattern.StartsWith("#");
             var isSubject = pattern.StartsWith("+");
+            var isTriplet = pattern.StartsWith("@");
 
             if (isWordGroup)
             {
@@ -59,6 +65,12 @@ namespace KnowledgeDialog2.Parsing.Triplet
             {
                 Id = pattern.Substring(1);
                 _matcher = createSubjectMatcher();
+                IsMultiMatch = true;
+            }
+            else if (isTriplet)
+            {
+                Id = pattern.Substring(1);
+                _matcher = createTripletMatcher();
             }
             else
             {

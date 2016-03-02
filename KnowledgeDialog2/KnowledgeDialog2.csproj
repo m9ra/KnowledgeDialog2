@@ -68,6 +68,7 @@
     <Compile Include="Parsing\Lexical\LexicalExpression.cs" />
     <Compile Include="Parsing\Lexical\LexicalParser.cs" />
     <Compile Include="Parsing\Lexical\Word.cs" />
+    <Compile Include="Parsing\Lexical\Words\Conjunction.cs" />
     <Compile Include="Parsing\Lexical\Words\Preposition.cs" />
     <Compile Include="Parsing\Lexical\Words\Pronoun.cs" />
     <Compile Include="Parsing\Lexical\Words\QuestionWord.cs" />
