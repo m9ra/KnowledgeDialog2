@@ -19,6 +19,18 @@ namespace KnowledgeDialog2.Generation.Triplet
         /// </summary>
         private readonly Entity _me;
 
+        private static readonly HashSet<string> _auxiliaryVerbs = new HashSet<string>()
+        {
+            //primary auxiliary verbs
+            "be", "is","am","are","was","were",
+            "have","has","had",
+            "do","does","did","done",
+
+            //modal auxiliary verbs
+            "will","would","can","could","may","might",
+            "shall","should","must","ought","used"
+        };
+
         public TripletNLG(Entity me)
         {
             _me = me;
@@ -31,17 +43,31 @@ namespace KnowledgeDialog2.Generation.Triplet
         /// <returns>The string representation.</returns>
         public string Generate(IEnumerable<TripletTree> triplets)
         {
-            var expressions = new List<string>();
+            var sentences = new List<string>();
             foreach (var triplet in triplets)
             {
-                var expression = generate(triplet);
-                expressions.Add(expression);
+                var sentence = makeSentence(triplet);
+                sentences.Add(sentence);
             }
 
-            var joinedResult = string.Join(", ", expressions);
-            var smoothedResult = smooth(joinedResult);
-            var sentence = char.ToUpper(smoothedResult[0]) + smoothedResult.Substring(1) + ".";
-            return sentence;
+            var joinedResult = string.Join(" ", sentences);
+            return joinedResult;
+        }
+
+        /// <summary>
+        /// Makes sentence from given triplet.
+        /// </summary>
+        /// <param name="triplet">Triplet which is used for triplet creation.</param>
+        /// <returns>The sentence.</returns>
+        private string makeSentence(TripletTree triplet)
+        {
+            var endMark = isQuestion(triplet) ? "?" : ".";
+
+            var expression = generateSentence(triplet);
+            expression = smooth(expression);
+            expression = char.ToUpper(expression[0]) + expression.Substring(1) + endMark;
+
+            return expression;
         }
 
         /// <summary>
@@ -59,13 +85,13 @@ namespace KnowledgeDialog2.Generation.Triplet
             replace(ref s, "we is", "We are");
             replace(ref s, "you is", "you are");
             replace(ref s, "they is", "they are");
-            replace(ref s, "I not", "I don't");
-            replace(ref s, "we not", "we don't");
-            replace(ref s, "you not", "you don't");
 
             //conventions
             replace(ref s, "question about", "whether");
             replace(ref s, "I thank", "Thank");
+            replace(ref s, "do not still", "still do not");
+            replace(ref s, "do not", "don't");
+            replace(ref s, "does not", "doesn't");
 
             return s;
         }
@@ -85,12 +111,43 @@ namespace KnowledgeDialog2.Generation.Triplet
         }
 
         /// <summary>
+        /// Generates string representation of semantic represented by given triplet as a standalone sentence without markers.
+        /// </summary>
+        /// <param name="triplet">The triplet.</param>
+        /// <returns>The string representation.</returns>
+        private string generateSentence(TripletTree triplet)
+        {
+            var tripletSubjectTree = triplet.Subject as TripletTree;
+            var tripletObjectTree = triplet.Object as TripletTree;
+
+            if (isQuestion(triplet))
+            {
+                var questionPredicatePart = generateQuestionPredicatePart(tripletObjectTree.Predicate);
+                var dependentPredicatePart = generateDependentPredicatePart(tripletObjectTree.Predicate);
+
+                if (questionPredicatePart != "")
+                    questionPredicatePart += " ";
+
+                if (dependentPredicatePart != "")
+                    dependentPredicatePart += " ";
+
+                return questionPredicatePart + generate(tripletObjectTree.Subject) + " " + dependentPredicatePart  + generate(tripletObjectTree.Object);
+            }
+
+            //otherwise we generate expression as usuall
+            return generate(triplet);
+        }
+
+        /// <summary>
         /// Generates string representation of semantic represented by given triplet.
         /// </summary>
         /// <param name="triplet">The triplet.</param>
         /// <returns>The string representation.</returns>
         private string generate(TripletTree triplet)
         {
+            var tripletSubjectTree = triplet.Subject as TripletTree;
+            var tripletObjectTree = triplet.Object as TripletTree;
+
             var tripletRepresentation = generate(triplet.Subject) + " " + generate(triplet.Predicate) + " " + generate(triplet.Object);
 
             if (Predicate.Then.Equals(triplet.Predicate))
@@ -114,7 +171,15 @@ namespace KnowledgeDialog2.Generation.Triplet
             //predicate dispatch
             var predicate = obj as Predicate;
             if (predicate != null && predicate.IsNegated)
-                return "not " + generate(predicate.Negation);
+            {
+                var predicateText = generate(predicate.Negation);
+
+                var auxiliaryVerb = findAuxiliary(predicate.Negation);
+                if (auxiliaryVerb != null)
+                    return predicateText.Replace(auxiliaryVerb, auxiliaryVerb + " not");
+
+                return "do not " + predicateText;
+            }
 
             //me dispatch
             if (_me.Equals(obj))
@@ -124,5 +189,67 @@ namespace KnowledgeDialog2.Generation.Triplet
             return obj.ToString();
         }
 
+        /// <summary>
+        /// Generates string representation predicate's part that can be
+        /// used at begining of a question.
+        /// </summary>
+        /// <param name="predicate">The predicate.</param>
+        /// <returns>The generated representation.</returns>
+        private string generateQuestionPredicatePart(Predicate predicate)
+        {
+            var auxiliaryVerb = findAuxiliary(predicate);
+
+            if (auxiliaryVerb == null)
+                return "do";
+
+            //questions begins with auxilar verb if possible
+            return auxiliaryVerb;
+        }
+
+        /// <summary>
+        /// Generates string representation predicate's part that can be
+        /// used at begining of a question.
+        /// </summary>
+        /// <param name="predicate">The predicate.</param>
+        /// <returns>The generated representation.</returns>
+        private string generateDependentPredicatePart(Predicate predicate)
+        {
+            var predicateText = generate(predicate);
+            var auxiliaryVerb = findAuxiliary(predicate);
+            if (auxiliaryVerb == null)
+                //whole predicate will be used
+                return predicateText;
+
+            return predicateText.Replace(auxiliaryVerb, "").Trim();
+        }
+
+        /// <summary>
+        /// Gets auxiliary verb from given predicate if available.
+        /// </summary>
+        /// <param name="predicate">The predicate.</param>
+        /// <returns>The auxiliary verb in same for as in predicate, <c>null</c> if such verb is not present.</returns>
+        private string findAuxiliary(Predicate predicate)
+        {
+            var text = generate(predicate);
+            var words = text.Split(' ');
+
+            foreach (var word in words)
+            {
+                if (_auxiliaryVerbs.Contains(word))
+                    return word;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Determine whether given triplet describes a question.
+        /// </summary>
+        /// <param name="triplet">Triplet to be tested.</param>
+        /// <returns><c>true</c> when triplet is question, <c>false</c> otherwise.</returns>
+        private bool isQuestion(TripletTree triplet)
+        {
+            return Entity.Question.Equals(triplet.Subject) && triplet.Object as TripletTree != null;
+        }
     }
 }

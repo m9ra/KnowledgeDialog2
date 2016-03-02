@@ -71,6 +71,11 @@ namespace KnowledgeDialog2.Management.Triplet
         private readonly List<TripletTree> _pendingQuestions = new List<TripletTree>();
 
         /// <summary>
+        /// Preconditions that has been already asked.
+        /// </summary>
+        private readonly HashSet<TripletTree> _askedPreconditions = new HashSet<TripletTree>();
+
+        /// <summary>
         /// Process triplets and provides according response.
         /// </summary>
         /// <param name="triplets">Input triplets.</param>
@@ -130,12 +135,14 @@ namespace KnowledgeDialog2.Management.Triplet
             {
                 //we don't have precondition to ask
                 if (isKnownQuestion)
-                    return triplet(Me, StillDontKnow, question.Object);
+                    return triplet(Me, StillDontKnow, question);
                 else
-                    return triplet(Me, Know.Negation, question.Object);
+                    return triplet(Me, Know.Negation, question);
             }
             else
             {
+                _askedPreconditions.Add(bestPrecondition);
+
                 return
                     triplet(Me, Predicate.Is.Negation, Sure).Concat(
                     triplet(Entity.Question, Predicate.About, bestPrecondition)
@@ -154,14 +161,12 @@ namespace KnowledgeDialog2.Management.Triplet
             var preconditions = reader.GetPreconditions().Take(100).ToList();
 
             preconditions.Sort((a, b) => a.Score.CompareTo(b.Score));
-            var bestCondition = preconditions.LastOrDefault();
+            var bestCondition = preconditions.Where(p => !_askedPreconditions.Contains(toTriplet(p.Wildcard))).LastOrDefault();
 
             if (bestCondition == null)
                 return null;
 
-            var conditionWildcard = bestCondition.Wildcard;
-            //TODO replace placeholders.
-            return TripletTree.From(conditionWildcard.SearchedSubject, conditionWildcard.SearchedPredicate, conditionWildcard.SearchedObject);
+            return toTriplet(bestCondition.Wildcard);
         }
 
         /// <summary>
@@ -196,7 +201,7 @@ namespace KnowledgeDialog2.Management.Triplet
                 }
             }
         }
-            
+
         /// <summary>
         /// Gets answers for questions that has been clarified during time.
         /// Those questions are also removed from pending ones.
@@ -300,6 +305,17 @@ namespace KnowledgeDialog2.Management.Triplet
         private IEnumerable<TripletTree> triplet(Entity subject, Predicate predicate, Entity obj)
         {
             return new[] { TripletTree.From(subject, predicate, obj) };
+        }
+
+        /// <summary>
+        /// Transforms wildcard to corresponding triplet.
+        /// </summary>
+        /// <param name="wildcard">The wildcard to be transformed.</param>
+        /// <returns>The triplet.</returns>
+        private TripletTree toTriplet(WildcardTriplet wildcard)
+        {
+            //TODO replace placeholders.
+            return TripletTree.From(wildcard.SearchedSubject, wildcard.SearchedPredicate, wildcard.SearchedObject);
         }
     }
 }
