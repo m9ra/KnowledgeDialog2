@@ -2,6 +2,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using KnowledgeDialog2.Database;
+using KnowledgeDialog2.Database.Triplet;    
+
 using KnowledgeDialog2.Inference;
 
 using KnowledgeDialog2.Test.Utilities;

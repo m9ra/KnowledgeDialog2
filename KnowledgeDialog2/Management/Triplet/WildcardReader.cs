@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using KnowledgeDialog2.Inference;
+using KnowledgeDialog2.Inference.Triplet;
 
 namespace KnowledgeDialog2.Management.Triplet
 {

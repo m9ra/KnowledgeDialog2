@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
+using KnowledgeDialog2.Database.Triplet;
 
-namespace KnowledgeDialog2.Inference
+namespace KnowledgeDialog2.Inference.Triplet
 {
     public class Precondition
     {

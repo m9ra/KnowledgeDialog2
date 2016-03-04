@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
+using KnowledgeDialog2.Database.Triplet;
 
-namespace KnowledgeDialog2.Inference.Core
+namespace KnowledgeDialog2.Inference.Triplet.Core
 {
     /// <summary>
     /// Event used for reporting of triplet receiving.

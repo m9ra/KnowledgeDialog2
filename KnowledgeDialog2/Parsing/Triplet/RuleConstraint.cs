@@ -60,7 +60,7 @@ namespace KnowledgeDialog2.Parsing.Triplet
         /// <returns>The created matcher.</returns>
         protected Predicate<TripletWordGroup> createTripletMatcher()
         {
-            return g => g.RawGroup is Database.TripletTree;
+            return g => g.RawGroup is Database.Triplet.TripletTree;
         }
 
         /// <summary>

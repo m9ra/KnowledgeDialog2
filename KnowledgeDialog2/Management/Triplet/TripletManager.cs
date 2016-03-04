@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
+using KnowledgeDialog2.Database.Triplet;
+
 using KnowledgeDialog2.Parsing.Triplet;
 
 namespace KnowledgeDialog2.Management.Triplet

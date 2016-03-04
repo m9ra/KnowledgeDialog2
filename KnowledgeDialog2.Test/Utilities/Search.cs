@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
+using KnowledgeDialog2.Database.Triplet;    
 
 namespace KnowledgeDialog2.Test.Utilities
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KnowledgeDialog2.Database
+namespace KnowledgeDialog2.Database.Triplet
 {
     public class TripletTree : Entity
     {

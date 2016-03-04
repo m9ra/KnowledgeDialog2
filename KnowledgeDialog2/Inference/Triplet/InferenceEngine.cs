@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
-using KnowledgeDialog2.Inference.Rules;
-using KnowledgeDialog2.Inference.Core;
+using KnowledgeDialog2.Database.Triplet;
 
-namespace KnowledgeDialog2.Inference
+using KnowledgeDialog2.Inference.Triplet.Rules;
+using KnowledgeDialog2.Inference.Triplet.Core;
+
+namespace KnowledgeDialog2.Inference.Triplet
 {
     public class InferenceEngine
     {

@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
-using KnowledgeDialog2.Inference;
+using KnowledgeDialog2.Database.Triplet;
 
+using KnowledgeDialog2.Inference.Triplet;
 using KnowledgeDialog2.Management.Triplet;
 
 namespace CurioChatBot

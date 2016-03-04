@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
+using KnowledgeDialog2.Database.Triplet;
 
-using KnowledgeDialog2.Inference.Rules;
+using KnowledgeDialog2.Inference.Triplet.Rules;
 
-namespace KnowledgeDialog2.Inference.Core
+namespace KnowledgeDialog2.Inference.Triplet.Core
 {
     /// <summary>
     /// State of single 

@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 using KnowledgeDialog2.Database;
+using KnowledgeDialog2.Database.Triplet;
 
-using KnowledgeDialog2.Inference.Core;
+using KnowledgeDialog2.Inference.Triplet.Core;
 
-namespace KnowledgeDialog2.Inference.Rules
+namespace KnowledgeDialog2.Inference.Triplet.Rules
 {
     public class ImplicationStep : InferenceStep
     {

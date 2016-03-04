@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using KnowledgeDialog2.Database;
-using KnowledgeDialog2.Inference;   
+using KnowledgeDialog2.Database.Triplet;
+
+using KnowledgeDialog2.Inference.Triplet;   
 
 namespace KnowledgeDialog2.Test.Utilities
 {

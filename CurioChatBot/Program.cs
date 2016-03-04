@@ -43,7 +43,7 @@ namespace CurioChatBot
                 ConsoleServices.PrintLine(sentence, ConsoleServices.ActiveColor);
                 ConsoleServices.PrintLine(triplets, ConsoleServices.InfoColor);
                 ConsoleServices.PrintEmptyLine();
-            }
+            } 
             Console.ReadKey();
         }
     }
