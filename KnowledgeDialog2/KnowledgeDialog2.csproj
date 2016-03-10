@@ -44,9 +44,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\Nplet\Edge.cs" />
+    <Compile Include="Database\Nplet\NpletTree.cs" />
     <Compile Include="Database\Triplet\SubstitutionMapping.cs" />
     <Compile Include="Dialog\DialogSystem.cs" />
     <Compile Include="Generation\Triplet\TripletNLG.cs" />
+    <Compile Include="Inference\Nplet\Core\Context.cs" />
+    <Compile Include="Inference\Nplet\Core\NpletProducerNode.cs" />
+    <Compile Include="Inference\Nplet\Core\NpletQueryNode.cs" />
+    <Compile Include="Inference\Nplet\Core\QueryReader.cs" />
+    <Compile Include="Inference\Nplet\InferenceEngine.cs" />
+    <Compile Include="Inference\Nplet\Rules\GeneralizationRule.cs" />
+    <Compile Include="Inference\Nplet\Rules\ImplicationRule.cs" />
+    <Compile Include="Inference\Nplet\Rules\InferenceRule.cs" />
     <Compile Include="Inference\Triplet\Precondition.cs" />
     <Compile Include="Management\Triplet\TripletManager.cs" />
     <Compile Include="Inference\Triplet\Core\InferenceLevel.cs" />
