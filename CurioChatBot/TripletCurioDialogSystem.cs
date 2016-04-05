@@ -17,7 +17,7 @@ using KnowledgeDialog2.Generation.Triplet;
 
 namespace CurioChatBot
 {
-    class CurioDialogSystem : DialogSystem
+    class TripletCurioDialogSystem : DialogSystem
     {
         /// <summary>
         /// Parser for lexical layer.
@@ -39,7 +39,7 @@ namespace CurioChatBot
         /// </summary>
         private readonly TripletNLG _nlGenerator;
 
-        internal CurioDialogSystem(string lexiconRoot)
+        internal TripletCurioDialogSystem(string lexiconRoot)
         {
             _lexicalParser = new LexicalParser(lexiconRoot);
             _tripletParser = new TripletParser();

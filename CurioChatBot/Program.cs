@@ -16,7 +16,7 @@ namespace CurioChatBot
     {
         static void Main(string[] args)
         {
-            var dialogSystem = new CurioDialogSystem(args[0]);
+            var dialogSystem = new NpletCurioDialogSystem();
             dialogSystem.Input("anything which is made of snow is white");
             dialogSystem.Input("anything which is made of frozen water is made of snow");
             dialogSystem.Input("is snowball white");
@@ -36,12 +36,12 @@ namespace CurioChatBot
                 if (sentence == null)
                     break;
 
-                var triplets = dialogSystem.ParseToTriplets(sentence);
-                if (triplets == null)
+                var nplet = dialogSystem.ParseToNplet(sentence);
+                if (nplet == null)
                     //parsing was not successful
                     continue;
                 ConsoleServices.PrintLine(sentence, ConsoleServices.ActiveColor);
-                ConsoleServices.PrintLine(triplets, ConsoleServices.InfoColor);
+                ConsoleServices.PrintLine(nplet, ConsoleServices.InfoColor);
                 ConsoleServices.PrintEmptyLine();
             } 
             Console.ReadKey();

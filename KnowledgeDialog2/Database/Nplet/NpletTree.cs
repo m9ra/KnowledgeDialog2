@@ -21,7 +21,7 @@ namespace KnowledgeDialog2.Database.Nplet
 
         internal static NpletTree From(string npletName, params Edge[] edges)
         {
-            throw new NotImplementedException();
+            return new NpletTree(npletName, edges);
         }
 
         internal Edge GetEdge(int edgeIndex)

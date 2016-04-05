@@ -44,7 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CurioDialogSystem.cs" />
+    <Compile Include="NpletCurioDialogSystem.cs" />
+    <Compile Include="TripletCurioDialogSystem.cs" />
     <Compile Include="CurioManager.cs" />
     <Compile Include="DataProcessing\TextToSentenceParser.cs" />
     <Compile Include="InferenceWildcardReader.cs" />
